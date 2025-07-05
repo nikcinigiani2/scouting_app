@@ -19,6 +19,7 @@ const initialForm = {
   ruolo: '',
   descrizione_match: '',
   data_segnalazione: '',
+  telefono_genitore: '',
 };
 
 const RUOLI = ['Portiere', 'Difensore', 'Centrocampista', 'Attaccante'];
@@ -39,11 +40,13 @@ function Segnalati() {
   const [editMode, setEditMode] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [editForm, setEditForm] = useState(initialForm);
+  const [telefonoGenitore, setTelefonoGenitore] = useState('');
+  const [convertiDialogOpen, setConvertiDialogOpen] = useState(false);
 
   const fetchSegnalati = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://127.0.0.1:8001/api/segnalati/');
+      const res = await axios.get('http://127.0.0.1:8000/api/segnalati/');
       setSegnalati(res.data);
     } catch (err) {
       console.error('Errore nel recupero dei segnalati:', err);
@@ -71,7 +74,7 @@ function Segnalati() {
     setError(null); 
     setSuccess(null);
     try {
-      await axios.post('http://127.0.0.1:8001/api/segnalati/', form);
+      await axios.post('http://127.0.0.1:8000/api/segnalati/', form);
       setSuccess('Giocatore segnalato con successo!');
       fetchSegnalati();
       setOpen(false);
@@ -105,6 +108,7 @@ function Segnalati() {
       ruolo: giocatore.ruolo || '',
       descrizione_match: giocatore.descrizione_match || '',
       data_segnalazione: giocatore.data_segnalazione || '',
+      telefono_genitore: giocatore.telefono_genitore || '',
     });
     setDetailOpen(true);
     setEditMode(false);
@@ -117,7 +121,7 @@ function Segnalati() {
   const handleEdit = async e => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8001/api/segnalati/${selectedGiocatore.id}/`, editForm);
+      await axios.put(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`, editForm);
       setSuccess('Giocatore modificato con successo!');
       fetchSegnalati();
       setEditMode(false);
@@ -138,7 +142,7 @@ function Segnalati() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://127.0.0.1:8001/api/segnalati/${selectedGiocatore.id}/`);
+      await axios.delete(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`);
       setSuccess('Giocatore eliminato con successo!');
       fetchSegnalati();
       setDeleteConfirmOpen(false);
@@ -151,13 +155,15 @@ function Segnalati() {
 
   const handlePassaAVisionato = async () => {
     try {
-      await axios.post(`http://127.0.0.1:8001/api/converti/${selectedGiocatore.id}/`, {
+      await axios.post(`http://127.0.0.1:8000/api/converti/${selectedGiocatore.id}/`, {
         descrizione_dettagliata: editForm.descrizione_match,
-        telefono_genitore: ''
+        telefono_genitore: telefonoGenitore
       });
       setSuccess('Giocatore convertito in visionato con successo!');
       fetchSegnalati();
       setDetailOpen(false);
+      setConvertiDialogOpen(false);
+      setTelefonoGenitore('');
     } catch (err) {
       console.error('Errore nella conversione:', err);
       setError('Errore nella conversione in visionato.');
@@ -254,6 +260,17 @@ function Segnalati() {
                        onChange={handleEditChange}
                        required
                        InputLabelProps={{ shrink: true }}
+                       fullWidth
+                     />
+                   </Grid>
+                   <Grid item xs={12}>
+                     <TextField
+                       label="Numero cellulare genitore"
+                       name="telefono_genitore"
+                       value={editForm.telefono_genitore}
+                       onChange={handleEditChange}
+                       placeholder="+39XXXXXXXXX"
+                       helperText="Formato: +39 seguito da 9-12 cifre"
                        fullWidth
                      />
                    </Grid>
@@ -370,6 +387,15 @@ function Segnalati() {
                          <Typography variant="subtitle2" fontWeight="bold">Capacità cognitiva:</Typography>
                          <Typography>{selectedGiocatore?.capacita_cognitiva || '-'}</Typography>
                        </Box>
+                       <Box sx={{ 
+                         p: 2, 
+                         borderRadius: 2, 
+                         border: '1px solid #e0e0e0',
+                         backgroundColor: '#ffffff'
+                       }}>
+                         <Typography variant="subtitle2" fontWeight="bold">Telefono genitore:</Typography>
+                         <Typography>{selectedGiocatore?.telefono_genitore || '-'}</Typography>
+                       </Box>
                      </Stack>
                    </Grid>
                    
@@ -410,9 +436,33 @@ function Segnalati() {
                  >
                    Modifica
                  </Button>
-                 <Button type="button" color="primary" onClick={handlePassaAVisionato}>Passa a Visionato</Button>
+                 <Button type="button" color="primary" onClick={() => setConvertiDialogOpen(true)}>Passa a Visionato</Button>
                </>
              )}
+          </DialogActions>
+        </Dialog>
+
+        {/* Dialog di conversione in visionato */}
+        <Dialog open={convertiDialogOpen} onClose={() => setConvertiDialogOpen(false)} fullWidth maxWidth="sm">
+          <DialogTitle>Converti in Visionato</DialogTitle>
+          <DialogContent>
+            <DialogContentText sx={{ mb: 2 }}>
+              Inserisci il numero di cellulare del genitore per completare la conversione:
+            </DialogContentText>
+            <TextField
+              label="Numero cellulare genitore"
+              value={telefonoGenitore}
+              onChange={(e) => setTelefonoGenitore(e.target.value)}
+              fullWidth
+              placeholder="+39XXXXXXXXX"
+              helperText="Formato: +39 seguito da 9-12 cifre"
+            />
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+            {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConvertiDialogOpen(false)}>Annulla</Button>
+            <Button onClick={handlePassaAVisionato} variant="contained" color="primary">Conferma Conversione</Button>
           </DialogActions>
         </Dialog>
 
@@ -461,6 +511,14 @@ function Segnalati() {
                   onChange={handleChange}
                   required
                   InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="Numero cellulare genitore"
+                  name="telefono_genitore"
+                  value={form.telefono_genitore}
+                  onChange={handleChange}
+                  placeholder="+39XXXXXXXXX"
+                  helperText="Formato: +39 seguito da 9-12 cifre"
                 />
                 {error && <Alert severity="error">{error}</Alert>}
                 {success && <Alert severity="success">{success}</Alert>}

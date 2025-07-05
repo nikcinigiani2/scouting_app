@@ -42,6 +42,13 @@ class GiocatoreBase(models.Model):
         null=True,
         help_text="Collaboratore che ha registrato l'operazione (segnalazione o visione)."
     )
+    telefono_genitore = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        verbose_name="Numero cellulare genitore",
+        validators=[RegexValidator(regex=r'^\+39\d{9,12}$', message="Inserisci un numero valido in formato italiano.")]
+    )
 
     class Meta:
         abstract = True
@@ -77,15 +84,14 @@ class Visionato(GiocatoreBase):
         help_text="Descrizione dettagliata fornita dal collaboratore.",
         blank=True, null=True
     )
-    telefono_genitore = models.CharField(
-        max_length=15,
-        blank=True,
-        null=True,
-        validators=[RegexValidator(regex=r'^\+39\d{9,12}$', message="Inserisci un numero valido in formato italiano.")]
-    )
     data_segnalazione = models.DateField(
         verbose_name="Giorno in cui l'hai visto",
         help_text="Data in cui hai visto il giocatore giocare.",
+        default=timezone.now
+    )
+    data_revisione = models.DateField(
+        verbose_name="Data di revisione",
+        help_text="Data in cui il giocatore è stato convertito da segnalato a visionato.",
         default=timezone.now
     )
 

@@ -9,7 +9,8 @@ from .views import (
     SegnalatoSearchAPIView,
     VisionatoSearchAPIView,
     LoginView,
-    UserProfileView
+    UserProfileView,
+    GlobalSearchAPIView
 )
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path('visionati/ricerca/', VisionatoSearchAPIView.as_view(), name='visionato-search'),
     # Endpoint per la conversione
     path('converti/<int:pk>/', ConvertiSegnalatoToVisionatoAPIView.as_view(), name='converti-segnalato'),
+    # Endpoint per la ricerca globale
+    path('ricerca/', GlobalSearchAPIView.as_view(), name='global-search'),
 ]

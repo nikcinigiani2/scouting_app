@@ -6,11 +6,9 @@ import LoginPage from './LoginPage';
 import Dashboard from './Dashboard';
 import Segnalati from './Segnalati';
 import Visionati from './Visionati';
+import Ricerca from './Ricerca';
 import ProtectedRoute from './components/ProtectedRoute';
 import { isAuthenticated, clearTokens, getUser } from './utils/auth';
-
-// Placeholder per le pagine
-function Ricerca() { return <div>Ricerca Giocatori</div>; }
 function DettaglioGiocatore() { return <div>Dettaglio Giocatore</div>; }
 
 function App() {

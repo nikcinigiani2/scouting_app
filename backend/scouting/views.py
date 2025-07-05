@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
+from django.utils import timezone
+from django.db import models
 from rest_framework import generics, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -52,12 +54,20 @@ class ConvertiSegnalatoToVisionatoAPIView(APIView):
             "anno_nascita": segnalato.anno_nascita,
             "numero_maglia": segnalato.numero_maglia,
             "squadra": segnalato.squadra,
+            "nome": segnalato.nome,
+            "cognome": segnalato.cognome,
+            "struttura_fisica": segnalato.struttura_fisica,
+            "piede": segnalato.piede,
+            "capacita_fisica": segnalato.capacita_fisica,
+            "capacita_cognitiva": segnalato.capacita_cognitiva,
             "descrizione_match": segnalato.descrizione_match,
             "ruolo": segnalato.ruolo,
             "collaboratore": segnalato.collaboratore.id,
+            "data_segnalazione": segnalato.data_segnalazione,
+            "telefono_genitore": request.data.get("telefono_genitore", ""),
             # I campi extra per il Visionato possono essere forniti nel body della richiesta
             "descrizione_dettagliata": request.data.get("descrizione_dettagliata", ""),
-            "telefono_genitore": request.data.get("telefono_genitore", "")
+            "data_revisione": timezone.now().date()
         }
         serializer = VisionatoSerializer(data=visionato_data)
         if serializer.is_valid():
@@ -136,4 +146,82 @@ class UserProfileView(APIView):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'email': user.email,
+        })
+
+# Vista per la ricerca globale (segnalati + visionati)
+class GlobalSearchAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        # Parametri di ricerca
+        search = request.query_params.get('search', '')
+        squadra = request.query_params.get('squadra', '')
+        anno = request.query_params.get('anno', '')
+        ruolo = request.query_params.get('ruolo', '')
+        piede = request.query_params.get('piede', '')
+        tipo = request.query_params.get('tipo', 'tutti')  # 'segnalati', 'visionati', 'tutti'
+        
+        # Query per segnalati
+        segnalati_query = Segnalato.objects.all()
+        if search:
+            segnalati_query = segnalati_query.filter(
+                models.Q(nome__icontains=search) |
+                models.Q(cognome__icontains=search) |
+                models.Q(squadra__icontains=search) |
+                models.Q(struttura_fisica__icontains=search) |
+                models.Q(descrizione_match__icontains=search)
+            )
+        if squadra:
+            segnalati_query = segnalati_query.filter(squadra__icontains=squadra)
+        if anno:
+            segnalati_query = segnalati_query.filter(anno_nascita=anno)
+        if ruolo:
+            segnalati_query = segnalati_query.filter(ruolo=ruolo)
+        if piede:
+            segnalati_query = segnalati_query.filter(piede=piede)
+        
+        # Query per visionati
+        visionati_query = Visionato.objects.all()
+        if search:
+            visionati_query = visionati_query.filter(
+                models.Q(nome__icontains=search) |
+                models.Q(cognome__icontains=search) |
+                models.Q(squadra__icontains=search) |
+                models.Q(struttura_fisica__icontains=search) |
+                models.Q(descrizione_match__icontains=search)
+            )
+        if squadra:
+            visionati_query = visionati_query.filter(squadra__icontains=squadra)
+        if anno:
+            visionati_query = visionati_query.filter(anno_nascita=anno)
+        if ruolo:
+            visionati_query = visionati_query.filter(ruolo=ruolo)
+        if piede:
+            visionati_query = visionati_query.filter(piede=piede)
+        
+        # Serializza i risultati
+        segnalati_data = SegnalatoSerializer(segnalati_query, many=True).data
+        visionati_data = VisionatoSerializer(visionati_query, many=True).data
+        
+        # Aggiungi il tipo a ogni risultato
+        for item in segnalati_data:
+            item['tipo'] = 'segnalato'
+        for item in visionati_data:
+            item['tipo'] = 'visionato'
+        
+        # Combina i risultati in base al tipo richiesto
+        if tipo == 'segnalati':
+            results = segnalati_data
+        elif tipo == 'visionati':
+            results = visionati_data
+        else:  # 'tutti'
+            results = segnalati_data + visionati_data
+        
+        return Response({
+            'segnalati': segnalati_data,
+            'visionati': visionati_data,
+            'tutti': results,
+            'count_segnalati': len(segnalati_data),
+            'count_visionati': len(visionati_data),
+            'count_totale': len(results)
         })
