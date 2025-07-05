@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography, Alert, Paper } from '@mui/material';
+import { Box, Button, TextField, Typography, Alert, Paper, Avatar } from '@mui/material';
+import { Login as LoginIcon, SportsSoccer } from '@mui/icons-material';
 import { setTokens } from './utils/auth';
 import axios from './utils/auth';
+import logoFloria from './assets/logo_floria.png';
 
 function LoginPage({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
@@ -48,9 +50,37 @@ function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
-      <Paper elevation={3} sx={{ p: 4, minWidth: 320 }}>
-        <Typography variant="h5" mb={2}>Login</Typography>
+    <Box 
+      display="flex" 
+      justifyContent="center" 
+      alignItems="center" 
+      minHeight="80vh"
+      sx={{
+        background: 'linear-gradient(135deg, #004080 0%, #1565c0 100%)',
+        padding: 2
+      }}
+    >
+      <Paper 
+        elevation={6} 
+        sx={{ 
+          p: 4, 
+          minWidth: 400,
+          maxWidth: 450,
+          borderRadius: 3,
+          background: 'linear-gradient(135deg, #ffffff 0%, #fafafa 100%)',
+          border: '1px solid rgba(0, 64, 128, 0.1)'
+        }}
+      >
+        <Box textAlign="center" mb={3}>
+          <img src={logoFloria} alt="Logo Floria" style={{ width: 100, marginBottom: 16 }} />
+          <Typography variant="h4" mb={1} color="primary" fontWeight="bold">
+            Floria Scouting Manager
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Accedi al tuo account
+          </Typography>
+        </Box>
+        
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
@@ -60,6 +90,7 @@ function LoginPage({ onLoginSuccess }) {
             margin="normal"
             required
             disabled={loading}
+            sx={{ mb: 2 }}
           />
           <TextField
             label="Password"
@@ -70,14 +101,22 @@ function LoginPage({ onLoginSuccess }) {
             margin="normal"
             required
             disabled={loading}
+            sx={{ mb: 2 }}
           />
-          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+          {error && <Alert severity="error" sx={{ mt: 2, mb: 2 }}>{error}</Alert>}
           <Button 
             type="submit" 
             variant="contained" 
             color="primary" 
             fullWidth 
-            sx={{ mt: 2 }}
+            size="large"
+            startIcon={<LoginIcon />}
+            sx={{ 
+              mt: 2,
+              py: 1.5,
+              fontSize: '1.1rem',
+              fontWeight: 600
+            }}
             disabled={loading}
           >
             {loading ? 'Accesso in corso...' : 'Accedi'}

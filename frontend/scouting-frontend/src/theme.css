@@ -1,0 +1,132 @@
+/* Stili aggiuntivi per il tema blu */
+
+/* Miglioramenti per i Paper components */
+.MuiPaper-root {
+  box-shadow: 0 2px 8px rgba(0, 64, 128, 0.1) !important;
+  border: 1px solid rgba(0, 64, 128, 0.05) !important;
+}
+
+/* Miglioramenti per i Button */
+.MuiButton-containedPrimary {
+  background: linear-gradient(135deg, #004080 0%, #0056b3 100%) !important;
+  box-shadow: 0 2px 4px rgba(0, 64, 128, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #0066cc 100%) !important;
+  box-shadow: 0 4px 8px rgba(0, 64, 128, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Miglioramenti per i TextField */
+.MuiTextField-root .MuiOutlinedInput-root {
+  transition: all 0.3s ease !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root:hover {
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1) !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.2) !important;
+}
+
+/* Miglioramenti per i Dialog */
+.MuiDialog-paper {
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 64, 128, 0.15) !important;
+}
+
+/* Miglioramenti per i ListItem */
+.MuiListItem-root {
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.MuiListItem-root:hover {
+  background-color: rgba(0, 64, 128, 0.05) !important;
+  transform: translateX(4px) !important;
+}
+
+/* Miglioramenti per i Chip */
+.MuiChip-root {
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Miglioramenti per l'AppBar */
+.MuiAppBar-root {
+  background: linear-gradient(135deg, #004080 0%, #0056b3 100%) !important;
+  box-shadow: 0 2px 8px rgba(0, 64, 128, 0.2) !important;
+}
+
+/* Miglioramenti per i Card */
+.MuiCard-root {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 64, 128, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiCard-root:hover {
+  box-shadow: 0 8px 24px rgba(0, 64, 128, 0.15) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Miglioramenti per i Typography */
+.MuiTypography-h4,
+.MuiTypography-h5,
+.MuiTypography-h6 {
+  color: #004080 !important;
+  font-weight: 600 !important;
+}
+
+/* Miglioramenti per i Select */
+.MuiSelect-select {
+  border-radius: 8px !important;
+}
+
+/* Animazioni per i loading states */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Miglioramenti per i form fields */
+.form-field-container {
+  margin-bottom: 16px;
+}
+
+.form-field-container .MuiTextField-root {
+  width: 100%;
+}
+
+/* Miglioramenti per i dialog actions */
+.dialog-actions {
+  padding: 16px 24px !important;
+  gap: 12px !important;
+}
+
+/* Miglioramenti per i grid items */
+.grid-item {
+  padding: 8px !important;
+}
+
+/* Miglioramenti per i search results */
+.search-result-item {
+  border-left: 4px solid #004080 !important;
+  padding-left: 16px !important;
+  margin-bottom: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.search-result-item:hover {
+  border-left-width: 8px !important;
+  background-color: rgba(0, 64, 128, 0.02) !important;
+} 

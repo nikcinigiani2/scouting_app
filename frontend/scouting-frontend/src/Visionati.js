@@ -195,51 +195,27 @@ function Visionati() {
           </DialogTitle>
           <DialogContent>
             {editMode ? (
-              <form id="edit-form" onSubmit={handleEdit}>
-                <Grid container spacing={2} mt={1}>
-                  <Grid item xs={6}>
+              <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                <form id="edit-form" onSubmit={handleEdit}>
+                  <Stack spacing={2} mt={1}>
                     <TextField label="Nome" name="nome" value={editForm.nome} onChange={handleEditChange} fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Cognome" name="cognome" value={editForm.cognome} onChange={handleEditChange} fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Squadra" name="squadra" value={editForm.squadra} onChange={handleEditChange} required fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Anno di nascita" name="anno_nascita" value={editForm.anno_nascita} onChange={handleEditChange} required type="number" fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Numero maglia" name="numero_maglia" value={editForm.numero_maglia} onChange={handleEditChange} required type="number" fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Struttura fisica" name="struttura_fisica" value={editForm.struttura_fisica} onChange={handleEditChange} fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField select label="Piede" name="piede" value={editForm.piede} onChange={handleEditChange} fullWidth>
                       <MenuItem value="">-</MenuItem>
                       {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
                     </TextField>
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField select label="Ruolo" name="ruolo" value={editForm.ruolo} onChange={handleEditChange} required fullWidth>
                       <MenuItem value="">-</MenuItem>
                       {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
                     </TextField>
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Capacità fisica" name="capacita_fisica" value={editForm.capacita_fisica} onChange={handleEditChange} fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={editForm.capacita_cognitiva} onChange={handleEditChange} fullWidth />
-                  </Grid>
-                  <Grid item xs={12}>
                     <TextField label="Descrizione match" name="descrizione_match" value={editForm.descrizione_match} onChange={handleEditChange} multiline rows={3} fullWidth />
-                  </Grid>
-                  <Grid item xs={12}>
                     <TextField label="Descrizione dettagliata" name="descrizione_dettagliata" value={editForm.descrizione_dettagliata} onChange={handleEditChange} multiline rows={3} fullWidth />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField
                       label="Giorno in cui l'hai visto"
                       name="data_segnalazione"
@@ -250,8 +226,6 @@ function Visionati() {
                       InputLabelProps={{ shrink: true }}
                       fullWidth
                     />
-                  </Grid>
-                  <Grid item xs={6}>
                     <TextField
                       label="Data di revisione"
                       name="data_revisione"
@@ -262,8 +236,6 @@ function Visionati() {
                       InputLabelProps={{ shrink: true }}
                       fullWidth
                     />
-                  </Grid>
-                  <Grid item xs={12}>
                     <TextField
                       label="Numero cellulare genitore"
                       name="telefono_genitore"
@@ -273,165 +245,172 @@ function Visionati() {
                       helperText="Formato: +39 seguito da 9-12 cifre"
                       fullWidth
                     />
-                  </Grid>
-                </Grid>
-              </form>
+                  </Stack>
+                </form>
+              </Box>
             ) : (
-              <Box>
-                <Grid container spacing={3}>
-                  {/* Colonna sinistra */}
-                  <Grid item xs={6}>
-                    <Stack spacing={2}>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Nome:</Typography>
-                        <Typography>{selectedGiocatore?.nome || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Squadra:</Typography>
-                        <Typography>{selectedGiocatore?.squadra}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Numero maglia:</Typography>
-                        <Typography>{selectedGiocatore?.numero_maglia}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Piede:</Typography>
-                        <Typography>{selectedGiocatore?.piede || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Capacità fisica:</Typography>
-                        <Typography>{selectedGiocatore?.capacita_fisica || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Giorno in cui l'hai visto:</Typography>
-                        <Typography>{selectedGiocatore?.data_segnalazione}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Data di revisione:</Typography>
-                        <Typography>{selectedGiocatore?.data_revisione}</Typography>
-                      </Box>
-                    </Stack>
-                  </Grid>
+              <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                <Stack spacing={2}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Nome:</Typography>
+                    <Typography>{selectedGiocatore?.nome || '-'}</Typography>
+                  </Box>
                   
-                  {/* Colonna destra */}
-                  <Grid item xs={6}>
-                    <Stack spacing={2}>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Cognome:</Typography>
-                        <Typography>{selectedGiocatore?.cognome || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Anno di nascita:</Typography>
-                        <Typography>{selectedGiocatore?.anno_nascita}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Ruolo:</Typography>
-                        <Typography>{selectedGiocatore?.ruolo}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Struttura fisica:</Typography>
-                        <Typography>{selectedGiocatore?.struttura_fisica || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#f8f9fa'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Capacità cognitiva:</Typography>
-                        <Typography>{selectedGiocatore?.capacita_cognitiva || '-'}</Typography>
-                      </Box>
-                      <Box sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid #e0e0e0',
-                        backgroundColor: '#ffffff'
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">Telefono genitore:</Typography>
-                        <Typography>{selectedGiocatore?.telefono_genitore || '-'}</Typography>
-                      </Box>
-                    </Stack>
-                  </Grid>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Cognome:</Typography>
+                    <Typography>{selectedGiocatore?.cognome || '-'}</Typography>
+                  </Box>
                   
-                  {/* Campi a larghezza completa sotto le colonne */}
-                  <Grid item xs={12}>
-                    <Box sx={{ 
-                      p: 2, 
-                      borderRadius: 2, 
-                      border: '1px solid #e0e0e0',
-                      backgroundColor: '#f8f9fa'
-                    }}>
-                      <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
-                      <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box sx={{ 
-                      p: 2, 
-                      borderRadius: 2, 
-                      border: '1px solid #e0e0e0',
-                      backgroundColor: '#ffffff'
-                    }}>
-                      <Typography variant="subtitle2" fontWeight="bold">Descrizione dettagliata:</Typography>
-                      <Typography>{selectedGiocatore?.descrizione_dettagliata || '-'}</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Squadra:</Typography>
+                    <Typography>{selectedGiocatore?.squadra}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Anno di nascita:</Typography>
+                    <Typography>{selectedGiocatore?.anno_nascita}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Numero maglia:</Typography>
+                    <Typography>{selectedGiocatore?.numero_maglia}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Ruolo:</Typography>
+                    <Typography>{selectedGiocatore?.ruolo}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Piede:</Typography>
+                    <Typography>{selectedGiocatore?.piede || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Struttura fisica:</Typography>
+                    <Typography>{selectedGiocatore?.struttura_fisica || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Capacità fisica:</Typography>
+                    <Typography>{selectedGiocatore?.capacita_fisica || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Capacità cognitiva:</Typography>
+                    <Typography>{selectedGiocatore?.capacita_cognitiva || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Giorno in cui l'hai visto:</Typography>
+                    <Typography>{selectedGiocatore?.data_segnalazione}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Data di revisione:</Typography>
+                    <Typography>{selectedGiocatore?.data_revisione}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Telefono genitore:</Typography>
+                    <Typography>{selectedGiocatore?.telefono_genitore || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">ID Giocatore:</Typography>
+                    <Typography>{selectedGiocatore?.id || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#f8f9fa'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
+                    <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Descrizione dettagliata:</Typography>
+                    <Typography>{selectedGiocatore?.descrizione_dettagliata || '-'}</Typography>
+                  </Box>
+                </Stack>
               </Box>
             )}
             {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
@@ -479,56 +458,61 @@ function Visionati() {
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
           <DialogTitle>Aggiungi nuovo giocatore visionato</DialogTitle>
           <DialogContent>
-            <form id="visionato-form" onSubmit={handleSubmit}>
-              <Stack spacing={2} mt={1}>
-                <TextField label="Nome" name="nome" value={form.nome} onChange={handleChange} />
-                <TextField label="Cognome" name="cognome" value={form.cognome} onChange={handleChange} />
-                <TextField label="Squadra" name="squadra" value={form.squadra} onChange={handleChange} required />
-                <TextField label="Anno di nascita" name="anno_nascita" value={form.anno_nascita} onChange={handleChange} required type="number" />
-                <TextField label="Numero maglia" name="numero_maglia" value={form.numero_maglia} onChange={handleChange} required type="number" />
-                <TextField label="Struttura fisica" name="struttura_fisica" value={form.struttura_fisica} onChange={handleChange} />
-                <TextField select label="Piede" name="piede" value={form.piede} onChange={handleChange} >
-                  <MenuItem value="">-</MenuItem>
-                  {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
-                </TextField>
-                <TextField label="Capacità fisica" name="capacita_fisica" value={form.capacita_fisica} onChange={handleChange} />
-                <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={form.capacita_cognitiva} onChange={handleChange} />
-                <TextField select label="Ruolo" name="ruolo" value={form.ruolo} onChange={handleChange} required>
-                  <MenuItem value="">-</MenuItem>
-                  {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-                </TextField>
-                <TextField label="Descrizione match" name="descrizione_match" value={form.descrizione_match} onChange={handleChange} />
-                <TextField label="Descrizione dettagliata" name="descrizione_dettagliata" value={form.descrizione_dettagliata} onChange={handleChange} multiline rows={3} />
-                <TextField
-                  label="Giorno in cui l'hai visto"
-                  name="data_segnalazione"
-                  type="date"
-                  value={form.data_segnalazione}
-                  onChange={handleChange}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                  label="Data di revisione"
-                  name="data_revisione"
-                  type="date"
-                  value={form.data_revisione}
-                  onChange={handleChange}
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                  label="Numero cellulare genitore"
-                  name="telefono_genitore"
-                  value={form.telefono_genitore}
-                  onChange={handleChange}
-                  placeholder="+39XXXXXXXXX"
-                  helperText="Formato: +39 seguito da 9-12 cifre"
-                />
-                {error && <Alert severity="error">{error}</Alert>}
-                {success && <Alert severity="success">{success}</Alert>}
-              </Stack>
-            </form>
+            <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+              <form id="visionato-form" onSubmit={handleSubmit}>
+                <Stack spacing={2} mt={1}>
+                  <TextField label="Nome" name="nome" value={form.nome} onChange={handleChange} fullWidth />
+                  <TextField label="Cognome" name="cognome" value={form.cognome} onChange={handleChange} fullWidth />
+                  <TextField label="Squadra" name="squadra" value={form.squadra} onChange={handleChange} required fullWidth />
+                  <TextField label="Anno di nascita" name="anno_nascita" value={form.anno_nascita} onChange={handleChange} required type="number" fullWidth />
+                  <TextField label="Numero maglia" name="numero_maglia" value={form.numero_maglia} onChange={handleChange} required type="number" fullWidth />
+                  <TextField label="Struttura fisica" name="struttura_fisica" value={form.struttura_fisica} onChange={handleChange} fullWidth />
+                  <TextField select label="Piede" name="piede" value={form.piede} onChange={handleChange} fullWidth>
+                    <MenuItem value="">-</MenuItem>
+                    {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
+                  </TextField>
+                  <TextField label="Capacità fisica" name="capacita_fisica" value={form.capacita_fisica} onChange={handleChange} fullWidth />
+                  <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={form.capacita_cognitiva} onChange={handleChange} fullWidth />
+                  <TextField select label="Ruolo" name="ruolo" value={form.ruolo} onChange={handleChange} required fullWidth>
+                    <MenuItem value="">-</MenuItem>
+                    {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                  </TextField>
+                  <TextField label="Descrizione match" name="descrizione_match" value={form.descrizione_match} onChange={handleChange} multiline rows={3} fullWidth />
+                  <TextField label="Descrizione dettagliata" name="descrizione_dettagliata" value={form.descrizione_dettagliata} onChange={handleChange} multiline rows={3} fullWidth />
+                  <TextField
+                    label="Giorno in cui l'hai visto"
+                    name="data_segnalazione"
+                    type="date"
+                    value={form.data_segnalazione}
+                    onChange={handleChange}
+                    required
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Data di revisione"
+                    name="data_revisione"
+                    type="date"
+                    value={form.data_revisione}
+                    onChange={handleChange}
+                    required
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Numero cellulare genitore"
+                    name="telefono_genitore"
+                    value={form.telefono_genitore}
+                    onChange={handleChange}
+                    placeholder="+39XXXXXXXXX"
+                    helperText="Formato: +39 seguito da 9-12 cifre"
+                    fullWidth
+                  />
+                  {error && <Alert severity="error">{error}</Alert>}
+                  {success && <Alert severity="success">{success}</Alert>}
+                </Stack>
+              </form>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Annulla</Button>
