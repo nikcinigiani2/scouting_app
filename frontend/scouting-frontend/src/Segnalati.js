@@ -5,6 +5,8 @@ import {
   DialogContentText, Grid
 } from '@mui/material';
 import axios from './utils/auth';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 const initialForm = {
   nome: '',
@@ -20,6 +22,7 @@ const initialForm = {
   descrizione_match: '',
   data_segnalazione: '',
   telefono_genitore: '',
+  note_gara: null,
 };
 
 const RUOLI = ['Portiere', 'Difensore', 'Centrocampista', 'Attaccante'];
@@ -43,6 +46,8 @@ function Segnalati() {
   const [telefonoGenitore, setTelefonoGenitore] = useState('');
   const [convertiDialogOpen, setConvertiDialogOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const fetchSegnalati = async () => {
     try {
       setLoading(true);
@@ -56,7 +61,19 @@ function Segnalati() {
     }
   };
 
-  useEffect(() => { fetchSegnalati(); }, []);
+  useEffect(() => {
+    fetchSegnalati();
+  }, []);
+
+  useEffect(() => {
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError(null);
+        setSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, success]);
 
   const filtered = segnalati.filter(g =>
     (g.nome + ' ' + g.cognome + ' ' + g.squadra + ' ' + g.anno_nascita).toLowerCase().includes(search.toLowerCase())
@@ -69,12 +86,37 @@ function Segnalati() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = e => {
+    const file = e.target.files[0];
+    if (file && file.size > 2 * 1024 * 1024) {
+      setError('Il file supera i 2MB!');
+      return;
+    }
+    setForm({ ...form, note_gara: file });
+  };
+  const handleEditFileChange = e => {
+    const file = e.target.files[0];
+    if (file && file.size > 2 * 1024 * 1024) {
+      setError('Il file supera i 2MB!');
+      return;
+    }
+    setEditForm({ ...editForm, note_gara: file });
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     setError(null); 
     setSuccess(null);
     try {
-      await axios.post('http://127.0.0.1:8000/api/segnalati/', form);
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      await axios.post('http://127.0.0.1:8000/api/segnalati/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setSuccess('Giocatore segnalato con successo!');
       fetchSegnalati();
       setOpen(false);
@@ -109,6 +151,7 @@ function Segnalati() {
       descrizione_match: giocatore.descrizione_match || '',
       data_segnalazione: giocatore.data_segnalazione || '',
       telefono_genitore: giocatore.telefono_genitore || '',
+      note_gara: giocatore.note_gara || null,
     });
     setDetailOpen(true);
     setEditMode(false);
@@ -121,7 +164,19 @@ function Segnalati() {
   const handleEdit = async e => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`, editForm);
+      const formData = new FormData();
+      Object.entries(editForm).forEach(([key, value]) => {
+        if (key === 'note_gara') {
+          if (value && typeof value !== 'string') {
+            formData.append('note_gara', value);
+          }
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      await axios.put(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setSuccess('Giocatore modificato con successo!');
       fetchSegnalati();
       setEditMode(false);
@@ -172,6 +227,9 @@ function Segnalati() {
 
   return (
     <Box maxWidth={600} mx="auto" mt={4}>
+      <Button startIcon={<ArrowBack />} onClick={() => navigate('/home')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
+        Indietro
+      </Button>
       <Paper sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5">Giocatori Segnalati</Typography>
@@ -187,10 +245,13 @@ function Segnalati() {
         {loading && <Typography sx={{ mt: 2 }}>Caricamento...</Typography>}
         <List>
           {filtered.map(g => (
-            <ListItem key={g.id} button onClick={() => handleGiocatoreClick(g)}>
+            <ListItem key={g.id} button onClick={() => handleGiocatoreClick(g)} sx={{ mb: 2, borderRadius: 3, boxShadow: 3, background: '#fff', minHeight: 80, p: 3, border: '2px solid #e0e0e0', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6, borderColor: '#00408022' } }}>
               <ListItemText
-                primary={`${g.nome || ''} ${g.cognome || ''} (${g.squadra}, ${g.anno_nascita})`}
-                secondary={`ID: ${g.id} - Maglia: ${g.numero_maglia} - Ruolo: ${g.ruolo}`}
+                primary={<Typography variant="h6" fontWeight={700} color="primary.main">{`${g.nome || ''} ${g.cognome || ''}`}</Typography>}
+                secondary={<>
+                  <Typography variant="body2" color="text.secondary">{g.squadra}, {g.anno_nascita} | Maglia: {g.numero_maglia} | Ruolo: {g.ruolo}</Typography>
+                  <Typography variant="caption" color="text.disabled">ID: {g.id}</Typography>
+                </>}
               />
             </ListItem>
           ))}
@@ -249,6 +310,11 @@ function Segnalati() {
                       helperText="Formato: +39 seguito da 9-12 cifre"
                       fullWidth
                     />
+                    <Button variant="outlined" component="label">
+                      Carica Note Gara (PDF, max 2MB)
+                      <input type="file" accept="application/pdf" hidden onChange={handleEditFileChange} />
+                    </Button>
+                    {editForm.note_gara && <Typography variant="body2">File selezionato: {editForm.note_gara.name}</Typography>}
                   </Stack>
                 </form>
               </Box>
@@ -384,6 +450,13 @@ function Segnalati() {
                      <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
                      <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
                    </Box>
+                   {/* Nei dettagli mostra il link se presente */}
+                   {selectedGiocatore?.note_gara && (
+                     <Box sx={{ mt: 2 }}>
+                       <Typography variant="subtitle2" fontWeight="bold">Note Gara:</Typography>
+                       <a href={selectedGiocatore.note_gara} target="_blank" rel="noopener noreferrer">Visualizza PDF</a>
+                     </Box>
+                   )}
                  </Stack>
                </Box>
              )}
@@ -496,6 +569,11 @@ function Segnalati() {
                     helperText="Formato: +39 seguito da 9-12 cifre"
                     fullWidth
                   />
+                  <Button variant="outlined" component="label">
+                    Carica Note Gara (PDF, max 2MB)
+                    <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
+                  </Button>
+                  {form.note_gara && <Typography variant="body2">File selezionato: {form.note_gara.name}</Typography>}
                   {error && <Alert severity="error">{error}</Alert>}
                   {success && <Alert severity="success">{success}</Alert>}
                 </Stack>

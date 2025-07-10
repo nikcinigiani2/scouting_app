@@ -3,11 +3,17 @@ body {
   font-family: 'Roboto', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #004080 0%, #1565c0 100%);
+  background: #004080 !important;
   min-height: 100vh;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.MuiAppBar-root, .MuiPaper-root.MuiAppBar-root {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #004080 !important;
 }

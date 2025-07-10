@@ -10,8 +10,13 @@ from .views import (
     VisionatoSearchAPIView,
     LoginView,
     UserProfileView,
-    GlobalSearchAPIView
+    GlobalSearchAPIView,
+    NotaViewSet
 )
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'note', NotaViewSet, basename='nota')
 
 urlpatterns = [
     # API di autenticazione
@@ -31,3 +36,5 @@ urlpatterns = [
     # Endpoint per la ricerca globale
     path('ricerca/', GlobalSearchAPIView.as_view(), name='global-search'),
 ]
+
+urlpatterns += router.urls

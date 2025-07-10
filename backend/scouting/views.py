@@ -2,14 +2,14 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.db import models
-from rest_framework import generics, status, filters
+from rest_framework import generics, status, filters, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Segnalato, Visionato
-from .serializers import SegnalatoSerializer, VisionatoSerializer
+from .models import Segnalato, Visionato, Nota
+from .serializers import SegnalatoSerializer, VisionatoSerializer, NotaSerializer
 
 # CRUD per Segnalati
 class SegnalatoListCreateAPIView(generics.ListCreateAPIView):
@@ -225,3 +225,17 @@ class GlobalSearchAPIView(APIView):
             'count_visionati': len(visionati_data),
             'count_totale': len(results)
         })
+
+class NotaViewSet(viewsets.ModelViewSet):
+    queryset = Nota.objects.all()
+    serializer_class = NotaSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nome']
+    ordering_fields = ['data_caricamento', 'nome']
+    ordering = ['-data_caricamento']
+    def get_queryset(self):
+        qs = super().get_queryset()
+        anno = self.request.query_params.get('anno')
+        if anno:
+            qs = qs.filter(anno=anno)
+        return qs

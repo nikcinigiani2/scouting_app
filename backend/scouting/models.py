@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+
+def validate_pdf(value):
+    if not value.name.lower().endswith('.pdf'):
+        raise ValidationError('Il file deve essere un PDF.')
+    limit = 2 * 1024 * 1024  # 2MB
+    if value.size > limit:
+        raise ValidationError('Il file non può superare i 2MB.')
 
 User = get_user_model()
 
@@ -43,11 +51,18 @@ class GiocatoreBase(models.Model):
         help_text="Collaboratore che ha registrato l'operazione (segnalazione o visione)."
     )
     telefono_genitore = models.CharField(
-        max_length=15,
+        max_length=16,
         blank=True,
         null=True,
         verbose_name="Numero cellulare genitore",
-        validators=[RegexValidator(regex=r'^\+39\d{9,12}$', message="Inserisci un numero valido in formato italiano.")]
+        validators=[RegexValidator(regex=r'^\+39\d{9,12}$', message="Inserisci un numero valido in formato italiano (+39 seguito da 9-12 cifre).")]
+    )
+    note_gara = models.FileField(
+        upload_to='note_gara/',
+        null=True,
+        blank=True,
+        validators=[validate_pdf],
+        help_text="Carica un PDF (max 2MB) come Note Gara"
     )
 
     class Meta:
@@ -98,3 +113,14 @@ class Visionato(GiocatoreBase):
     class Meta:
         verbose_name = "Giocatore Visionato"
         verbose_name_plural = "Giocatori Visionati"
+
+
+class Nota(models.Model):
+    ANNI = [(a, str(a)) for a in range(2010, 2017)]
+    anno = models.PositiveIntegerField(choices=ANNI)
+    file = models.FileField(upload_to='note_referti/')
+    nome = models.CharField(max_length=255)
+    data_caricamento = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.nome} ({self.anno})"

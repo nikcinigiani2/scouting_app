@@ -6,6 +6,8 @@ import {
   AccordionSummary, AccordionDetails, Card, CardContent
 } from '@mui/material';
 import { Search, FilterList, ExpandMore, Person, Visibility } from '@mui/icons-material';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 import axios from './utils/auth';
 
 const RUOLI = ['Portiere', 'Difensore', 'Centrocampista', 'Attaccante'];
@@ -29,6 +31,8 @@ function Ricerca() {
   const [error, setError] = useState(null);
   const [selectedGiocatore, setSelectedGiocatore] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSearch = async () => {
     setLoading(true);
@@ -84,6 +88,9 @@ function Ricerca() {
 
   return (
     <Box maxWidth={1200} mx="auto" mt={4}>
+      <Button startIcon={<ArrowBack />} onClick={() => navigate('/home')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
+        Indietro
+      </Button>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h4" mb={3} textAlign="center">
           Ricerca Giocatori

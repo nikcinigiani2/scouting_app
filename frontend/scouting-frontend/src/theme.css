@@ -57,8 +57,10 @@
 }
 
 /* Miglioramenti per l'AppBar */
-.MuiAppBar-root {
-  background: linear-gradient(135deg, #004080 0%, #0056b3 100%) !important;
+.MuiAppBar-root, .MuiPaper-root.MuiAppBar-root {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #004080 !important;
   box-shadow: 0 2px 8px rgba(0, 64, 128, 0.2) !important;
 }
 

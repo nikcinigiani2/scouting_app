@@ -36,7 +36,7 @@ function LoginPage({ onLoginSuccess }) {
         onLoginSuccess(response.data.user);
       }
       
-      navigate('/dashboard');
+      navigate('/home');
     } catch (err) {
       console.error('Errore login:', err);
       if (err.response?.data?.error) {

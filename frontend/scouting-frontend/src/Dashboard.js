@@ -1,17 +1,22 @@
 import React from 'react';
 import { Box, Typography, Button, Stack, Paper, Grid } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   PersonAdd, 
   Visibility, 
   Search, 
-  Dashboard as DashboardIcon 
+  Dashboard as DashboardIcon,
+  ArrowBack
 } from '@mui/icons-material';
 import logoFloria from './assets/logo_floria.png';
 
 function Dashboard() {
+  const navigate = useNavigate();
   return (
-    <Box maxWidth={1200} mx="auto" mt={4} sx={{ background: 'linear-gradient(135deg, #004080 0%, #1565c0 100%)', borderRadius: 3, boxShadow: 2 }}>
+    <Box maxWidth={1200} mx="auto" mt={4} sx={{ background: 'linear-gradient(135deg,rgb(241, 245, 248) 0%, #1565c0 100%)', borderRadius: 3, boxShadow: 2 }}>
+      <Button startIcon={<ArrowBack />} onClick={() => navigate('/home')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
+        Indietro
+      </Button>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Box textAlign="center" mb={4}>
           <img src={logoFloria} alt="Logo Floria" style={{ width: 100, marginBottom: 16 }} />
