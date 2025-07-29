@@ -24,20 +24,22 @@ from rest_framework_simplejwt.views import (
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('scouting.urls')),  # Tutte le API sono sotto /api/
+    path('api/', include('apps.scouting.urls')),  # Tutte le API sono sotto /api/
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('accounts/', include('django.contrib.auth.urls')),  # Autenticazione built-in
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-}
+
+
+
+# Servi MEDIA in sviluppo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

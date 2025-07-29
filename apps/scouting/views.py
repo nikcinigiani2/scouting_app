@@ -11,6 +11,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Segnalato, Visionato, Nota
 from .serializers import SegnalatoSerializer, VisionatoSerializer, NotaSerializer
 
+from django.conf import settings
+from django.http import FileResponse, Http404
+import os
+
 # CRUD per Segnalati
 class SegnalatoListCreateAPIView(generics.ListCreateAPIView):
     queryset = Segnalato.objects.all()
@@ -233,9 +237,17 @@ class NotaViewSet(viewsets.ModelViewSet):
     search_fields = ['nome']
     ordering_fields = ['data_caricamento', 'nome']
     ordering = ['-data_caricamento']
+
     def get_queryset(self):
         qs = super().get_queryset()
         anno = self.request.query_params.get('anno')
         if anno:
             qs = qs.filter(anno=anno)
         return qs
+
+    # ← Aggiungi questo metodo ↓↓↓
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        ctx['request'] = self.request
+        return ctx
+

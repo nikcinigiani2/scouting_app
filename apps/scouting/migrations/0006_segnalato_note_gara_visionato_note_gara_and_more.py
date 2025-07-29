@@ -4,7 +4,6 @@ import django.core.validators
 import apps.scouting.models
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,12 +14,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='segnalato',
             name='note_gara',
-            field=models.FileField(blank=True, help_text='Carica un PDF (max 2MB) come Note Gara', null=True, upload_to='note_gara/', validators=[scouting.models.validate_pdf]),
+            field=models.FileField(blank=True, help_text='Carica un PDF (max 2MB) come Note Gara', null=True, upload_to='note_gara/', validators=[apps.scouting.models.validate_pdf]),
         ),
         migrations.AddField(
             model_name='visionato',
             name='note_gara',
-            field=models.FileField(blank=True, help_text='Carica un PDF (max 2MB) come Note Gara', null=True, upload_to='note_gara/', validators=[scouting.models.validate_pdf]),
+            field=models.FileField(blank=True, help_text='Carica un PDF (max 2MB) come Note Gara', null=True, upload_to='note_gara/', validators=[apps.scouting.models.validate_pdf]),
         ),
         migrations.AlterField(
             model_name='segnalato',

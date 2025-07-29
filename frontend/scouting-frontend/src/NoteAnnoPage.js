@@ -97,23 +97,12 @@ function NoteAnnoPage() {
     }
   };
 
-  const handleDownload = async (fileUrl, fileName) => {
-    try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/note_referti/${fileName}`, {
-        responseType: 'blob',
-        withCredentials: true,
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      setError('Errore nel download del file');
-    }
-  };
+  const handleDownload = (fileUrl) => {
+  const url = fileUrl.startsWith('http')
+    ? fileUrl
+    : `${window.location.origin}${fileUrl}`;
+  window.open(url, '_blank');
+};
 
   return (
     <Box sx={{ background: 'transparent', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
