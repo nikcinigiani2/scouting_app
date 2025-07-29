@@ -132,3 +132,14 @@
   border-left-width: 8px !important;
   background-color: rgba(0, 64, 128, 0.02) !important;
 } 
+
+/* Forza bottoni bianchi custom */
+.MuiButton-contained.white-btn {
+  background: #fff !important;
+  color: #004080 !important;
+  border: 1px solid #004080 !important;
+  font-weight: 600 !important;
+}
+.MuiButton-contained.white-btn:hover {
+  background: #f0f4fa !important;
+} 

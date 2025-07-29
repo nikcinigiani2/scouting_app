@@ -97,6 +97,24 @@ function NoteAnnoPage() {
     }
   };
 
+  const handleDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/note_referti/${fileName}`, {
+        responseType: 'blob',
+        withCredentials: true,
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      setError('Errore nel download del file');
+    }
+  };
+
   return (
     <Box sx={{ background: 'transparent', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
       <Button startIcon={<ArrowBack />} onClick={() => navigate('/notereferti')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
@@ -133,11 +151,11 @@ function NoteAnnoPage() {
           ))}
         </TextField>
         <form onSubmit={handleUpload} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Button variant="contained" component="label" startIcon={<UploadFile />} disabled={uploading} sx={{ bgcolor: '#fff', color: 'primary.main', fontWeight: 600, border: '1px solid #004080', '&:hover': { bgcolor: '#f0f4fa' } }}>
+          <Button variant="contained" component="label" startIcon={<UploadFile />} disabled={uploading} className="white-btn" sx={{ fontWeight: 600 }}>
             Carica PDF
             <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
           </Button>
-          <Button type="submit" variant="contained" color="primary" disabled={!file || uploading} sx={{ bgcolor: '#fff', color: 'primary.main', fontWeight: 600, border: '1px solid #004080', '&:hover': { bgcolor: '#f0f4fa' } }}>
+          <Button type="submit" variant="contained" disabled={!file || uploading} className="white-btn" sx={{ fontWeight: 600 }}>
             {uploading ? <CircularProgress size={20} /> : 'Upload'}
           </Button>
           {file && <Typography variant="body2" color="#004080">{file.name}</Typography>}
@@ -160,7 +178,12 @@ function NoteAnnoPage() {
                     <Typography variant="body2" color="text.secondary">Caricato il {new Date(f.data_caricamento).toLocaleString()}</Typography>
                   </Box>
                   <Box>
-                    <IconButton href={f.file} target="_blank" rel="noopener noreferrer" sx={{ color: 'primary.main', bgcolor: '#fff !important' }}><CloudDownload /></IconButton>
+                    <IconButton 
+                      onClick={() => handleDownload(f.file, f.file.split('/').pop())}
+                      sx={{ color: 'primary.main', bgcolor: '#fff !important' }}
+                    >
+                      <CloudDownload />
+                    </IconButton>
                     <IconButton color="error" onClick={() => handleDelete(f.id)} sx={{ bgcolor: '#fff !important' }}><Delete /></IconButton>
                   </Box>
                 </Box>
