@@ -9,7 +9,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scouting_app.settings')
 django.setup()
 
-from scouting.models import Segnalato, Visionato
+from apps.scouting.models import Segnalato, Visionato
 
 def clear_all_players():
     """Elimina tutti i giocatori segnalati e visionati"""
