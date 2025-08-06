@@ -1,12 +1,21 @@
+// src/pages/LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography, Alert, Paper, Avatar } from '@mui/material';
-import { Login as LoginIcon, SportsSoccer } from '@mui/icons-material';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert
+} from '@mui/material';
+import { Login as LoginIcon } from '@mui/icons-material';
 import { setTokens } from './utils/auth';
 import axios from './utils/auth';
 import logoFloria from './assets/logo_floria.png';
+import abstractBackground from './assets/abstract-blue-bg.png';
 
-function LoginPage({ onLoginSuccess }) {
+export default function LoginPage({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -17,80 +26,83 @@ function LoginPage({ onLoginSuccess }) {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
         username,
         password
       });
-      
-      // Salva i token usando la funzione di utilità
       setTokens(
         response.data.access_token,
         response.data.refresh_token,
         response.data.user
       );
-      
-      // Notifica l'App.js che il login è avvenuto con successo
-      if (onLoginSuccess) {
-        onLoginSuccess(response.data.user);
-      }
-      
-      navigate('/home');
+      if (onLoginSuccess) onLoginSuccess(response.data.user);
+      navigate('/home', { replace: true });
     } catch (err) {
       console.error('Errore login:', err);
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError('Credenziali non valide o errore di connessione');
-      }
+      setError(err.response?.data?.error || 'Credenziali non valide o errore di connessione');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="80vh"
+    <Box
       sx={{
-        background: 'linear-gradient(135deg, #004080 0%, #1565c0 100%)',
-        padding: 2
+        position: 'fixed',
+        inset: 0,
+        backgroundImage: `url(${abstractBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
     >
-      <Paper 
-        elevation={6} 
-        sx={{ 
-          p: 4, 
-          minWidth: 400,
-          maxWidth: 450,
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, #ffffff 0%, #fafafa 100%)',
-          border: '1px solid rgba(0, 64, 128, 0.1)'
+      <Paper
+        elevation={8}
+        sx={{
+          p: 6,
+          width: 500,
+          maxWidth: '90%',
+          borderRadius: 4,
+          bgcolor: '#ffffff',        // stesso colore di sfondo del logo
+          textAlign: 'center'
         }}
       >
-        <Box textAlign="center" mb={3}>
-          <img src={logoFloria} alt="Logo Floria" style={{ width: 100, marginBottom: 16 }} />
-          <Typography variant="h4" mb={1} color="primary" fontWeight="bold">
+        <Box mb={3}>
+          <img
+            src={logoFloria}
+            alt="Logo Floria"
+            style={{ width: 120, marginBottom: 16 }}
+          />
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ fontWeight: 700, color: '#ffffff' }}
+          >
             Floria Scouting Manager
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)' }}>
             Accedi al tuo account
           </Typography>
         </Box>
-        
+
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
             value={username}
             onChange={e => setUsername(e.target.value)}
             fullWidth
-            margin="normal"
+            margin="dense"
             required
             disabled={loading}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              bgcolor: '#ffffff',
+              borderRadius: 1
+            }}
           />
           <TextField
             label="Password"
@@ -98,26 +110,35 @@ function LoginPage({ onLoginSuccess }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
             fullWidth
-            margin="normal"
+            margin="dense"
             required
             disabled={loading}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              bgcolor: '#ffffff',
+              borderRadius: 1
+            }}
           />
-          {error && <Alert severity="error" sx={{ mt: 2, mb: 2 }}>{error}</Alert>}
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            fullWidth 
+          {error && (
+            <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
             size="large"
             startIcon={<LoginIcon />}
-            sx={{ 
-              mt: 2,
-              py: 1.5,
-              fontSize: '1.1rem',
-              fontWeight: 600
-            }}
+            fullWidth
             disabled={loading}
+            sx={{
+              mt: 3,
+              py: 1.5,
+              fontSize: '1.2rem',
+              fontWeight: 700,
+              bgcolor: 'secondary.main',
+              '&:hover': { bgcolor: 'secondary.dark' }
+            }}
           >
             {loading ? 'Accesso in corso...' : 'Accedi'}
           </Button>
@@ -126,5 +147,3 @@ function LoginPage({ onLoginSuccess }) {
     </Box>
   );
 }
-
-export default LoginPage; 
