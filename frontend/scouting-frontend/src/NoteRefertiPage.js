@@ -1,89 +1,161 @@
-import React, { useState } from 'react';
-import { Box, Typography, Grid, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert } from '@mui/material';
-import FolderIcon from '@mui/icons-material/Folder';
-import ArrowBack from '@mui/icons-material/ArrowBack';
+// src/NoteRefertiPage.js
+import React from 'react';
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Paper
+} from '@mui/material';
+import { ArrowBack, Folder } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import logoFloria from './assets/logo_floria.png';
+import abstractBackground from './assets/abstract-blue-bg.png';
+import { clearTokens } from './utils/auth';
 
 const ANNI = [2010, 2011, 2012, 2013, 2014, 2015, 2016];
 
-function NoteRefertiPage() {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [selectedAnno, setSelectedAnno] = useState(null);
-  const [file, setFile] = useState(null);
-  const [error, setError] = useState('');
+export default function NoteRefertiPage() {
+  const nav = useNavigate();
 
-  const handleOpen = (anno) => {
-    navigate(`/notereferti/${anno}`);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedAnno(null);
-    setFile(null);
-    setError('');
-  };
-
-  const handleFileChange = (e) => {
-    const f = e.target.files[0];
-    if (f && f.size > 2 * 1024 * 1024) {
-      setError('Il file supera i 2MB!');
-      setFile(null);
-    } else {
-      setError('');
-      setFile(f);
-    }
-  };
-
-  const handleUpload = (e) => {
-    e.preventDefault();
-    if (!file) {
-      setError('Seleziona un file');
-      return;
-    }
-    // Qui andrà la chiamata API per l'upload
-    alert(`File per annata ${selectedAnno} pronto per upload (mock)`);
-    handleClose();
+  const handleBack = () => nav(-1);
+  const handleLogout = () => {
+    clearTokens();
+    nav('/login', { replace: true });
   };
 
   return (
-    <Box sx={{ background: 'transparent', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
-      <Button startIcon={<ArrowBack />} onClick={() => navigate('/home')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
-        Indietro
-      </Button>
-      <Typography variant="h4" fontWeight={700} mb={4} color="primary">
-        Note e Referti
-      </Typography>
-      <Typography variant="body1" mb={3} color="primary.main">
-        Seleziona una cartella per caricare o consultare i file relativi all'annata:
-      </Typography>
-      <Box display="flex" flexDirection="column" gap={2}>
-        {ANNI.map(anno => (
-          <Paper key={anno} elevation={3} sx={{ p: 3, textAlign: 'left', cursor: 'pointer', borderRadius: 2, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', background: '#fff', color: 'primary.main' }} onClick={() => handleOpen(anno)}>
-            <FolderIcon sx={{ fontSize: 48, color: 'primary.main', mr: 2 }} />
-            <Typography variant="h6" mt={1}>{anno}</Typography>
-          </Paper>
-        ))}
-      </Box>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Carica file per annata {selectedAnno}</DialogTitle>
-        <DialogContent>
-          <Box component="form" onSubmit={handleUpload}>
-            <Button variant="contained" component="label" sx={{ mb: 2 }}>
-              Scegli file
-              <input type="file" hidden onChange={handleFileChange} />
-            </Button>
-            {file && <Typography variant="body2">File selezionato: {file.name}</Typography>}
-            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+    <Box
+      component="main"
+      sx={{
+        position: 'fixed',
+        inset: 0,
+        backgroundImage: `url(${abstractBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Navbar */}
+      <AppBar
+        position="absolute"
+        color="transparent"
+        elevation={0}
+        sx={{
+          bgcolor: 'rgba(255,255,255,0.9)',
+          zIndex: theme => theme.zIndex.drawer + 1
+        }}
+      >
+        <Toolbar disableGutters sx={{ px: 2, height: 64, display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <img src={logoFloria} alt="Floria" style={{ height: 40 }} />
+            <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
+              Floria Scouting Manager
+            </Typography>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Annulla</Button>
-          <Button onClick={handleUpload} variant="contained" color="primary" disabled={!file || !!error}>Carica</Button>
-        </DialogActions>
-      </Dialog>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Button
+              component="button"
+              onClick={() => nav('/dashboard')}
+              variant="text"
+              sx={{ color: '#1565c0', textTransform: 'none' }}
+            >
+              Scouting
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outlined"
+              sx={{
+                borderColor: '#1565c0',
+                color: '#1565c0',
+                borderRadius: '999px',
+                textTransform: 'none',
+                px: 2,
+                '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Back button */}
+      <Box sx={{ pt: 12, px: 2 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={handleBack}
+          sx={{
+            bgcolor: 'rgba(255,255,255,0.9)',
+            color: '#1565c0',
+            fontWeight: 600,
+            textTransform: 'none',
+            borderRadius: 2,
+            px: 2,
+            '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+          }}
+        >
+          Torna indietro
+        </Button>
+      </Box>
+
+      {/* Lista annate */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          px: { xs: 2, sm: 4 },
+          py: 2,
+          overflowY: 'auto'
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            color: '#fff !important',
+            fontWeight: 700,
+            mb: 1,
+            textAlign: 'center'
+          }}
+        >
+          Note e Referti
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: 'rgba(255,255,255,0.85)',
+            mb: 3,
+            textAlign: 'center'
+          }}
+        >
+          Seleziona l’annata:
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {ANNI.map(anno => (
+            <Paper
+              key={anno}
+              elevation={4}
+              onClick={() => nav(`/notereferti/${anno}`)}
+              sx={{
+                p: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                borderRadius: 2,
+                bgcolor: 'rgba(255,255,255,0.85)',
+                cursor: 'pointer'
+              }}
+            >
+              <Folder sx={{ fontSize: 40, color: '#1565c0' }} />
+              <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 600 }}>
+                {anno}
+              </Typography>
+            </Paper>
+          ))}
+        </Box>
+      </Box>
     </Box>
   );
 }
-
-export default NoteRefertiPage; 

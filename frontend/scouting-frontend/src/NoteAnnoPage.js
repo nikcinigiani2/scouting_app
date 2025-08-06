@@ -1,10 +1,37 @@
+// src/NoteAnnoPage.js
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Button, TextField, Stack, Paper, IconButton, InputAdornment, MenuItem, CircularProgress, Alert } from '@mui/material';
-import { Search, Delete, CloudDownload, UploadFile } from '@mui/icons-material';
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  TextField,
+  Stack,
+  Paper,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  CircularProgress,
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from '@mui/material';
+import {
+  Search,
+  Delete,
+  CloudDownload,
+  UploadFile,
+  InsertDriveFile
+} from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from './utils/auth';
+import logoFloria from './assets/logo_floria.png';
+import abstractBackground from './assets/abstract-blue-bg.png';
+import { clearTokens } from './utils/auth';
 
 const ORDER_OPTIONS = [
   { value: '-data_caricamento', label: 'Più recenti' },
@@ -13,8 +40,9 @@ const ORDER_OPTIONS = [
   { value: '-nome', label: 'Nome Z-A' },
 ];
 
-function NoteAnnoPage() {
+export default function NoteAnnoPage() {
   const { anno } = useParams();
+  const nav = useNavigate();
   const [files, setFiles] = useState([]);
   const [search, setSearch] = useState('');
   const [order, setOrder] = useState('-data_caricamento');
@@ -23,7 +51,6 @@ function NoteAnnoPage() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(null);
-  const navigate = useNavigate();
 
   const fetchFiles = async () => {
     setLoading(true);
@@ -33,7 +60,7 @@ function NoteAnnoPage() {
       if (search) params.search = search;
       const res = await axios.get('http://127.0.0.1:8000/api/note/', { params });
       setFiles(res.data);
-    } catch (err) {
+    } catch {
       setError('Errore nel caricamento dei file');
     } finally {
       setLoading(false);
@@ -54,21 +81,29 @@ function NoteAnnoPage() {
     }
   }, [error, success]);
 
+  const handleBack = () => nav(-1);
+  const handleLogout = () => {
+    clearTokens();
+    nav('/login', { replace: true });
+  };
+
   const handleFileChange = e => {
     const f = e.target.files[0];
-    if (f && f.size > 2 * 1024 * 1024) {
-      setError('Il file supera i 2MB!');
-      return;
+    if (f && f.size > 5 * 1024 * 1024) {
+      setError('Il file supera il limite di 5 MB');
+      setFile(null);
+    } else {
+      setError(null);
+      setFile(f);
     }
-    setFile(f);
   };
 
   const handleUpload = async e => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
     if (!file) return;
     setUploading(true);
+    setError(null);
+    setSuccess(null);
     try {
       const formData = new FormData();
       formData.append('anno', anno);
@@ -80,109 +115,228 @@ function NoteAnnoPage() {
       setSuccess('File caricato con successo!');
       setFile(null);
       fetchFiles();
-    } catch (err) {
+    } catch {
       setError('Errore nel caricamento del file');
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
     if (!window.confirm('Vuoi eliminare questo file?')) return;
     try {
       await axios.delete(`http://127.0.0.1:8000/api/note/${id}/`);
       fetchFiles();
-    } catch (err) {
-      setError('Errore nell\'eliminazione del file');
+    } catch {
+      setError("Errore nell'eliminazione del file");
     }
   };
 
-  const handleDownload = (fileUrl) => {
-  const url = fileUrl.startsWith('http')
-    ? fileUrl
-    : `${window.location.origin}${fileUrl}`;
-  window.open(url, '_blank');
-};
+  const handleDownload = fileUrl => {
+    const url = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
+    window.open(url, '_blank');
+  };
 
   return (
-    <Box sx={{ background: 'transparent', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
-      <Button startIcon={<ArrowBack />} onClick={() => navigate('/notereferti')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
-        Indietro
-      </Button>
-      <Typography variant="h4" fontWeight={700} mb={2} color="primary">
-        Note e Referti {anno}
-      </Typography>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={3} alignItems="center">
-        <TextField
-          label="Cerca per nome"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          InputProps={{
-            style: { background: '#fff', color: '#004080', fontWeight: 600 },
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={fetchFiles} sx={{ color: 'primary.main', bgcolor: '#fff !important' }}><Search /></IconButton>
-              </InputAdornment>
-            )
+    <Box
+      component="main"
+      sx={{
+        position: 'fixed',
+        inset: 0,
+        backgroundImage: `url(${abstractBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      {/* Navbar */}
+      <AppBar position="absolute" color="transparent" elevation={0}
+        sx={{ bgcolor: 'rgba(255,255,255,0.9)', zIndex: theme => theme.zIndex.drawer + 1 }}>
+        <Toolbar disableGutters sx={{ px: 2, height: 64, display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <img src={logoFloria} alt="Floria" style={{ height: 40 }} />
+            <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
+              Floria Scouting Manager
+            </Typography>
+          </Box>
+          <Button onClick={handleLogout} variant="outlined"
+            sx={{
+              borderColor: '#1565c0',
+              color: '#1565c0',
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 2,
+              '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
+            }}>
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      {/* Back button */}
+      <Box sx={{ pt: 12, px: 2 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBack}
+          sx={{
+            bgcolor: 'rgba(255,255,255,0.9)',
+            color: '#1565c0',
+            fontWeight: 600,
+            textTransform: 'none',
+            borderRadius: 2,
+            px: 2,
+            '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
           }}
-          sx={{ background: '#fff', color: 'primary.main', borderRadius: 1 }}
-        />
-        <TextField
-          select
-          label="Ordina per"
-          value={order}
-          onChange={e => setOrder(e.target.value)}
-          sx={{ minWidth: 180, background: '#fff', color: 'primary.main', borderRadius: 1 }}
-          InputProps={{ style: { color: '#004080', fontWeight: 600 } }}
         >
-          {ORDER_OPTIONS.map(opt => (
-            <MenuItem key={opt.value} value={opt.value} sx={{ color: 'primary.main' }}>{opt.label}</MenuItem>
-          ))}
-        </TextField>
-        <form onSubmit={handleUpload} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Button variant="contained" component="label" startIcon={<UploadFile />} disabled={uploading} className="white-btn" sx={{ fontWeight: 600 }}>
-            Carica PDF
-            <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
-          </Button>
-          <Button type="submit" variant="contained" disabled={!file || uploading} className="white-btn" sx={{ fontWeight: 600 }}>
-            {uploading ? <CircularProgress size={20} /> : 'Upload'}
-          </Button>
-          {file && <Typography variant="body2" color="#004080">{file.name}</Typography>}
-        </form>
-      </Stack>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-      {loading ? (
-        <Box textAlign="center" mt={4}><CircularProgress /></Box>
-      ) : (
-        <Paper sx={{ p: 2, background: '#fff', color: 'primary.main' }}>
-          {files.length === 0 ? (
-            <Typography>Nessun file caricato per il {anno}.</Typography>
-          ) : (
-            <Stack spacing={2}>
-              {files.map(f => (
-                <Box key={f.id} display="flex" alignItems="center" justifyContent="space-between" sx={{ borderBottom: '1px solid #eee', pb: 1 }}>
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight={600}>{f.nome}</Typography>
-                    <Typography variant="body2" color="text.secondary">Caricato il {new Date(f.data_caricamento).toLocaleString()}</Typography>
-                  </Box>
-                  <Box>
-                    <IconButton 
-                      onClick={() => handleDownload(f.file, f.file.split('/').pop())}
-                      sx={{ color: 'primary.main', bgcolor: '#fff !important' }}
-                    >
-                      <CloudDownload />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleDelete(f.id)} sx={{ bgcolor: '#fff !important' }}><Delete /></IconButton>
-                  </Box>
-                </Box>
-              ))}
-            </Stack>
-          )}
-        </Paper>
-      )}
+          Torna indietro
+        </Button>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{ flexGrow: 1, pt: 2, px: { xs: 2, sm: 4 }, pb: 4, overflowY: 'auto' }}>
+        <Typography variant="h5" sx={{ color: '#fff!important', fontWeight: 700, mb: 2 }}>
+          Note e Referti {anno}
+        </Typography>
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={3} alignItems="center">
+          <TextField
+            label="Cerca per nome"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={fetchFiles} sx={{ color: 'primary.main', bgcolor: '#fff !important' }}>
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+            sx={{
+              background: '#fff',
+              borderRadius: 1,
+              flexGrow: 1,
+              '& .MuiInputBase-input': { color: '#1565c0', fontWeight: 600 }
+            }}
+          />
+          <TextField
+            select
+            label="Ordina per"
+            value={order}
+            onChange={e => setOrder(e.target.value)}
+            variant="filled"
+            sx={{
+              width: 220,
+              background: '#fff',
+              borderRadius: 1,
+              '& .MuiInputLabel-root': {
+                color: '#1565c0',
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+                overflow: 'visible'
+              },
+              '& .MuiSelect-select': {
+                color: '#1565c0',
+                fontWeight: 500,
+                pt: '24px'
+              }
+            }}
+          >
+            {ORDER_OPTIONS.map(opt => (
+              <MenuItem key={opt.value} value={opt.value} sx={{ color: 'primary.main' }}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+        {loading ? (
+          <Box textAlign="center" mt={4}><CircularProgress /></Box>
+        ) : (
+          <>
+            <Paper sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.85)', borderRadius: 2 }}>
+              <List>
+                {files.length === 0 ? (
+                  <ListItem><ListItemText primary="Nessun file caricato" /></ListItem>
+                ) : files.map(f => (
+                  <ListItem
+                    key={f.id}
+                    secondaryAction={
+                      <Box>
+                        <IconButton onClick={() => handleDownload(f.file)}
+                          sx={{ color: 'primary.main', bgcolor: '#fff !important', mr: 1 }}>
+                          <CloudDownload />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleDelete(f.id)}
+                          sx={{ bgcolor: '#fff !important' }}>
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    }
+                  >
+                    <ListItemIcon><InsertDriveFile sx={{ color: 'primary.main' }} /></ListItemIcon>
+                    <ListItemText
+                      primary={f.nome}
+                      secondary={new Date(f.data_caricamento).toLocaleString()}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+
+            {/* Upload box */}
+            <Paper
+              component="form"
+              onSubmit={handleUpload}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                bgcolor: 'rgba(255,255,255,0.95)',
+                gap: 2
+              }}
+            >
+              <Button
+                variant="contained"
+                component="label"
+                startIcon={<UploadFile />}
+                disabled={uploading}
+                sx={{
+                  bgcolor: 'secondary.main',
+                  color: '#fff',
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: 'secondary.dark' }
+                }}
+              >
+                Scegli il PDF
+                <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
+              </Button>
+              <Typography variant="body2" sx={{ color: '#1565c0', fontWeight: 600, flexGrow: 1, textAlign: 'center' }}>
+                {file ? file.name : ''}
+              </Typography>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!file || uploading}
+                sx={{
+                  bgcolor: 'secondary.main',
+                  color: '#fff',
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: 'secondary.dark' }
+                }}
+              >
+                {uploading ? <CircularProgress size={20} color="inherit" /> : 'Upload'}
+              </Button>
+            </Paper>
+          </>
+        )}
+      </Box>
     </Box>
   );
 }
-
-export default NoteAnnoPage; 
