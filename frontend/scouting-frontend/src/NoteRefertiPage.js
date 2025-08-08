@@ -10,7 +10,7 @@ import {
   Paper
 } from '@mui/material';
 import { ArrowBack, Folder } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 import { clearTokens } from './utils/auth';
@@ -87,7 +87,10 @@ export default function NoteRefertiPage() {
       <Box sx={{ pt: 12, px: 2 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={handleBack}
+          //onClick={handleBack}
+          component={Link}
+            to="/home"
+            variant="outlined"
           sx={{
             bgcolor: 'rgba(255,255,255,0.9)',
             color: '#1565c0',

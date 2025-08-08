@@ -171,7 +171,7 @@ function Ricerca() {
       <Box sx={{ pt: 12, px: 2 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate('/home')}
+          onClick={() => navigate('/dashboard')}
           sx={{
             bgcolor: 'rgba(255,255,255,0.9)',
             color: '#1565c0',

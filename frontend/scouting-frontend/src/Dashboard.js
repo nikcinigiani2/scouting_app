@@ -125,7 +125,11 @@ export default function Dashboard() {
       <Box sx={{ pt: 10, px: 2 }}>
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
+          //onClick={handleBack}
+            //vorrei che onClick tornasse alla home page
+            component={Link}
+            to="/home"
+            variant="outlined"
           sx={{
             bgcolor: 'rgba(255,255,255,0.9)',
             color: '#1565c0',
