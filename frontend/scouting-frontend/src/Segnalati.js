@@ -1,12 +1,32 @@
+// src/Segnalati.js
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, Typography, TextField, Button, List, ListItem, ListItemText, Paper, Stack, 
-  Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Alert, 
-  DialogContentText, Grid
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Alert,
+  DialogContentText,
+  Grid
 } from '@mui/material';
 import axios from './utils/auth';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import logoFloria from './assets/logo_floria.png';
+import abstractBackground from './assets/abstract-blue-bg.png';
+import { clearTokens } from './utils/auth';
 
 const initialForm = {
   nome: '',
@@ -36,8 +56,8 @@ function Segnalati() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
-  
-  // Nuovi stati per le funzionalità richieste
+
+  // Nuovi stati (logica invariata)
   const [selectedGiocatore, setSelectedGiocatore] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -67,24 +87,23 @@ function Segnalati() {
 
   useEffect(() => {
     if (error || success) {
-      const timer = setTimeout(() => {
+      const t = setTimeout(() => {
         setError(null);
         setSuccess(null);
       }, 3000);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(t);
     }
   }, [error, success]);
 
   const filtered = segnalati.filter(g =>
-    (g.nome + ' ' + g.cognome + ' ' + g.squadra + ' ' + g.anno_nascita).toLowerCase().includes(search.toLowerCase())
+    (g.nome + ' ' + g.cognome + ' ' + g.squadra + ' ' + g.anno_nascita)
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   const handleOpen = () => { setForm(initialForm); setOpen(true); setError(null); setSuccess(null); };
   const handleClose = () => setOpen(false);
-
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleFileChange = e => {
     const file = e.target.files[0];
@@ -105,14 +124,12 @@ function Segnalati() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError(null); 
+    setError(null);
     setSuccess(null);
     try {
       const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          formData.append(key, value);
-        }
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) formData.append(k, v);
       });
       await axios.post('http://127.0.0.1:8000/api/segnalati/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -121,21 +138,16 @@ function Segnalati() {
       fetchSegnalati();
       setOpen(false);
     } catch (err) {
-      console.error('Errore nell\'inserimento:', err);
+      console.error("Errore nell'inserimento:", err);
       if (err.response && err.response.data) {
-        setError(
-          typeof err.response.data === 'string'
-            ? err.response.data
-            : JSON.stringify(err.response.data)
-        );
+        setError(typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data));
       } else {
-        setError('Errore nell\'inserimento. Controlla i dati.');
+        setError("Errore nell'inserimento. Controlla i dati.");
       }
     }
   };
 
-  // Nuove funzioni per gestire il click sul giocatore
-  const handleGiocatoreClick = (giocatore) => {
+  const handleGiocatoreClick = giocatore => {
     setSelectedGiocatore(giocatore);
     setEditForm({
       nome: giocatore.nome || '',
@@ -157,21 +169,17 @@ function Segnalati() {
     setEditMode(false);
   };
 
-  const handleEditChange = e => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
+  const handleEditChange = e => setEditForm({ ...editForm, [e.target.name]: e.target.value });
 
   const handleEdit = async e => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      Object.entries(editForm).forEach(([key, value]) => {
-        if (key === 'note_gara') {
-          if (value && typeof value !== 'string') {
-            formData.append('note_gara', value);
-          }
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, value);
+      Object.entries(editForm).forEach(([k, v]) => {
+        if (k === 'note_gara') {
+          if (v && typeof v !== 'string') formData.append('note_gara', v);
+        } else if (v !== null && v !== undefined) {
+          formData.append(k, v);
         }
       });
       await axios.put(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`, formData, {
@@ -184,11 +192,7 @@ function Segnalati() {
     } catch (err) {
       console.error('Errore nella modifica:', err);
       if (err.response && err.response.data) {
-        setError(
-          typeof err.response.data === 'string'
-            ? err.response.data
-            : JSON.stringify(err.response.data)
-        );
+        setError(typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data));
       } else {
         setError('Errore nella modifica. Controlla i dati.');
       }
@@ -203,7 +207,7 @@ function Segnalati() {
       setDeleteConfirmOpen(false);
       setDetailOpen(false);
     } catch (err) {
-      console.error('Errore nell\'eliminazione:', err);
+      console.error("Errore nell'eliminazione:", err);
       setError('Errore nell\'eliminazione del giocatore.');
     }
   };
@@ -225,337 +229,208 @@ function Segnalati() {
     }
   };
 
+  const handleLogout = () => {
+    clearTokens();
+    navigate('/login', { replace: true });
+  };
+
   return (
-    <Box maxWidth={600} mx="auto" mt={4}>
-      <Button startIcon={<ArrowBack />} onClick={() => navigate('/home')} sx={{ mb: 2, bgcolor: '#fff', color: 'primary.main', fontWeight: 600 }}>
-        Indietro
-      </Button>
-      <Paper sx={{ p: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h5">Giocatori Segnalati</Typography>
-          <Button variant="contained" color="primary" onClick={handleOpen}>Segnala giocatore</Button>
-        </Stack>
-        <TextField
-          label="Cerca giocatore"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        {loading && <Typography sx={{ mt: 2 }}>Caricamento...</Typography>}
-        <List>
-          {filtered.map(g => (
-            <ListItem key={g.id} button onClick={() => handleGiocatoreClick(g)} sx={{ mb: 2, borderRadius: 3, boxShadow: 3, background: '#fff', minHeight: 80, p: 3, border: '2px solid #e0e0e0', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6, borderColor: '#00408022' } }}>
-              <ListItemText
-                primary={<Typography variant="h6" fontWeight={700} color="primary.main">{`${g.nome || ''} ${g.cognome || ''}`}</Typography>}
-                secondary={<>
-                  <Typography variant="body2" color="text.secondary">{g.squadra}, {g.anno_nascita} | Maglia: {g.numero_maglia} | Ruolo: {g.ruolo}</Typography>
-                  <Typography variant="caption" color="text.disabled">ID: {g.id}</Typography>
-                </>}
-              />
-            </ListItem>
-          ))}
-        </List>
+    <Box
+      component="main"
+      sx={{
+        position: 'fixed',
+        inset: 0,
+        backgroundImage: `url(${abstractBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      {/* Navbar nuova */}
+      <AppBar position="absolute" color="transparent" elevation={0}
+        sx={{ bgcolor: 'rgba(255,255,255,0.9)', zIndex: theme => theme.zIndex.drawer + 1 }}
+      >
+        <Toolbar sx={{ px: 2, height: 64, justifyContent: 'space-between' }}>
+          <Box onClick={() => navigate('/home')} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <img src={logoFloria} alt="Floria" style={{ height: 40, marginRight: 8 }} />
+            <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
+              Floria Scouting
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button onClick={() => navigate('/notereferti')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
+              Note & Referti
+            </Button>
+            <Button onClick={() => navigate('/dashboard')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
+              Scouting
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outlined"
+              sx={{
+                borderColor: '#1565c0',
+                color: '#1565c0',
+                borderRadius: '999px',
+                textTransform: 'none',
+                px: 2,
+                '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-        {/* Dialog per dettagli/modifica giocatore */}
-        <Dialog 
-          open={detailOpen} 
-          onClose={() => setDetailOpen(false)} 
-          fullWidth 
-          maxWidth="md"
-          disableEscapeKeyDown={editMode}
-          disableBackdropClick={editMode}
+      {/* Back sotto navbar (logica invariata: torna alla Home) */}
+      <Box sx={{ pt: 12, px: 2 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/home')}
+          sx={{
+            bgcolor: 'rgba(255,255,255,0.9)',
+            color: '#1565c0',
+            fontWeight: 600,
+            textTransform: 'none',
+            borderRadius: 2,
+            px: 2,
+            '&:hover': { bgcolor: 'rgba(255,255,255,1)' }
+          }}
         >
-          <DialogTitle>
-            {editMode ? 'Modifica Giocatore' : 'Dettagli Giocatore'}
-          </DialogTitle>
-          <DialogContent>
-            {editMode ? (
-              <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                <form id="edit-form" onSubmit={handleEdit}>
-                  <Stack spacing={2} mt={1}>
-                    <TextField label="Nome" name="nome" value={editForm.nome} onChange={handleEditChange} fullWidth />
-                    <TextField label="Cognome" name="cognome" value={editForm.cognome} onChange={handleEditChange} fullWidth />
-                    <TextField label="Squadra" name="squadra" value={editForm.squadra} onChange={handleEditChange} required fullWidth />
-                    <TextField label="Anno di nascita" name="anno_nascita" value={editForm.anno_nascita} onChange={handleEditChange} required type="number" fullWidth />
-                    <TextField label="Numero maglia" name="numero_maglia" value={editForm.numero_maglia} onChange={handleEditChange} required type="number" fullWidth />
-                    <TextField label="Struttura fisica" name="struttura_fisica" value={editForm.struttura_fisica} onChange={handleEditChange} fullWidth />
-                    <TextField select label="Piede" name="piede" value={editForm.piede} onChange={handleEditChange} fullWidth>
-                      <MenuItem value="">-</MenuItem>
-                      {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
-                    </TextField>
-                    <TextField select label="Ruolo" name="ruolo" value={editForm.ruolo} onChange={handleEditChange} required fullWidth>
-                      <MenuItem value="">-</MenuItem>
-                      {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-                    </TextField>
-                    <TextField label="Capacità fisica" name="capacita_fisica" value={editForm.capacita_fisica} onChange={handleEditChange} fullWidth />
-                    <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={editForm.capacita_cognitiva} onChange={handleEditChange} fullWidth />
-                    <TextField label="Descrizione match" name="descrizione_match" value={editForm.descrizione_match} onChange={handleEditChange} multiline rows={3} fullWidth />
-                    <TextField
-                      label="Giorno in cui l'hai visto"
-                      name="data_segnalazione"
-                      type="date"
-                      value={editForm.data_segnalazione}
-                      onChange={handleEditChange}
-                      required
-                      InputLabelProps={{ shrink: true }}
-                      fullWidth
-                    />
-                    <TextField
-                      label="Numero cellulare genitore"
-                      name="telefono_genitore"
-                      value={editForm.telefono_genitore}
-                      onChange={handleEditChange}
-                      placeholder="+39XXXXXXXXX"
-                      helperText="Formato: +39 seguito da 9-12 cifre"
-                      fullWidth
-                    />
-                    <Button variant="outlined" component="label">
-                      Carica Note Gara (PDF, max 2MB)
-                      <input type="file" accept="application/pdf" hidden onChange={handleEditFileChange} />
-                    </Button>
-                    {editForm.note_gara && <Typography variant="body2">File selezionato: {editForm.note_gara.name}</Typography>}
-                  </Stack>
-                </form>
-              </Box>
-                         ) : (
-               <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                 <Stack spacing={2}>
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Nome:</Typography>
-                     <Typography>{selectedGiocatore?.nome || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Cognome:</Typography>
-                     <Typography>{selectedGiocatore?.cognome || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Squadra:</Typography>
-                     <Typography>{selectedGiocatore?.squadra}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Anno di nascita:</Typography>
-                     <Typography>{selectedGiocatore?.anno_nascita}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Numero maglia:</Typography>
-                     <Typography>{selectedGiocatore?.numero_maglia}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Ruolo:</Typography>
-                     <Typography>{selectedGiocatore?.ruolo}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Piede:</Typography>
-                     <Typography>{selectedGiocatore?.piede || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Struttura fisica:</Typography>
-                     <Typography>{selectedGiocatore?.struttura_fisica || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Capacità fisica:</Typography>
-                     <Typography>{selectedGiocatore?.capacita_fisica || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Capacità cognitiva:</Typography>
-                     <Typography>{selectedGiocatore?.capacita_cognitiva || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Giorno in cui l'hai visto:</Typography>
-                     <Typography>{selectedGiocatore?.data_segnalazione}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#ffffff'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Telefono genitore:</Typography>
-                     <Typography>{selectedGiocatore?.telefono_genitore || '-'}</Typography>
-                   </Box>
-                   
-                   <Box sx={{ 
-                     p: 2, 
-                     borderRadius: 2, 
-                     border: '1px solid #e0e0e0',
-                     backgroundColor: '#f8f9fa'
-                   }}>
-                     <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
-                     <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
-                   </Box>
-                   {/* Nei dettagli mostra il link se presente */}
-                   {selectedGiocatore?.note_gara && (
-                     <Box sx={{ mt: 2 }}>
-                       <Typography variant="subtitle2" fontWeight="bold">Note Gara:</Typography>
-                       <a href={selectedGiocatore.note_gara} target="_blank" rel="noopener noreferrer">Visualizza PDF</a>
-                     </Box>
-                   )}
-                 </Stack>
-               </Box>
-             )}
-            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-            {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
-                         {editMode ? (
-               <>
-                 <Button type="button" onClick={() => setEditMode(false)}>Annulla</Button>
-                 <Button type="submit" form="edit-form" variant="contained">Salva Modifiche</Button>
-               </>
-             ) : (
-               <>
-                 <Button color="error" onClick={() => setDeleteConfirmOpen(true)}>Elimina Giocatore</Button>
-                 <Button 
-                   type="button" 
-                   onClick={(e) => {
-                     e.preventDefault();
-                     e.stopPropagation();
-                     setEditMode(true);
-                   }}
-                 >
-                   Modifica
-                 </Button>
-                 <Button type="button" color="primary" onClick={() => setConvertiDialogOpen(true)}>Passa a Visionato</Button>
-               </>
-             )}
-          </DialogActions>
-        </Dialog>
+          Torna indietro
+        </Button>
+      </Box>
 
-        {/* Dialog di conversione in visionato */}
-        <Dialog open={convertiDialogOpen} onClose={() => setConvertiDialogOpen(false)} fullWidth maxWidth="sm">
-          <DialogTitle>Converti in Visionato</DialogTitle>
-          <DialogContent>
-            <DialogContentText sx={{ mb: 2 }}>
-              Inserisci il numero di cellulare del genitore per completare la conversione:
-            </DialogContentText>
+      {/* Titolo sezione */}
+      <Typography
+        variant="h4"
+        sx={{ color: '#fff !important', fontWeight: 700, textAlign: 'center', mt: 2, mb: 2 }}
+      >
+        Giocatori Segnalati
+      </Typography>
+
+      {/* Wrapper contenuti (solo grafica cambiata) */}
+      <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4 }, pb: 4 }}>
+        <Paper
+          elevation={2}
+          sx={{
+            p: { xs: 2, sm: 3 },
+            borderRadius: 2,
+            maxWidth: 1000,
+            width: '100%',
+            mx: 'auto',
+            bgcolor: 'rgba(255,255,255,0.9)'
+          }}
+        >
+          {/* Header + azione */}
+          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} mb={2} spacing={2}>
             <TextField
-              label="Numero cellulare genitore"
-              value={telefonoGenitore}
-              onChange={(e) => setTelefonoGenitore(e.target.value)}
+              label="Cerca giocatore"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               fullWidth
-              placeholder="+39XXXXXXXXX"
-              helperText="Formato: +39 seguito da 9-12 cifre"
+              sx={{
+                bgcolor: '#fff',
+                borderRadius: 1,
+                '& .MuiInputBase-input': { color: '#1565c0', fontWeight: 500 }
+              }}
             />
-            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-            {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConvertiDialogOpen(false)}>Annulla</Button>
-            <Button onClick={handlePassaAVisionato} variant="contained" color="primary">Conferma Conversione</Button>
-          </DialogActions>
-        </Dialog>
+            <Button variant="contained" color="primary" onClick={handleOpen}
+              sx={{
+                alignSelf: { xs: 'stretch', sm: 'auto' },
+                borderRadius: '999px',
+                fontWeight: 600
+              }}
+            >
+              Segnala giocatore
+            </Button>
+          </Stack>
 
-        {/* Dialog di conferma eliminazione */}
-        <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
-          <DialogTitle sx={{ color: 'error.main' }}>Conferma Eliminazione</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Sei sicuro di voler eliminare questo giocatore? Questa azione non può essere annullata.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteConfirmOpen(false)}>Annulla</Button>
-            <Button onClick={handleDelete} color="error" variant="contained">Elimina</Button>
-          </DialogActions>
-        </Dialog>
+          {loading && <Typography sx={{ mt: 2 }}>Caricamento...</Typography>}
+          {/* Lista segnalati */}
+          <List>
+            {filtered.map(g => (
+              <ListItem
+                key={g.id}
+                button
+                onClick={() => handleGiocatoreClick(g)}
+                sx={{
+                  mb: 2,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  background: '#fff',
+                  minHeight: 80,
+                  p: 2.5,
+                  border: '1px solid #e0e0e0',
+                  transition: 'transform 0.15s ease, box-shadow 0.2s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 6,
+                    borderColor: '#00408022'
+                  }
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="h6" fontWeight={700} color="primary.main">
+                      {(g.nome || '') + ' ' + (g.cognome || '')}
+                    </Typography>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2" color="text.secondary">
+                        {g.squadra}, {g.anno_nascita} | Maglia: {g.numero_maglia} | Ruolo: {g.ruolo}
+                      </Typography>
+                      <Typography variant="caption" color="text.disabled">ID: {g.id}</Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+      </Box>
 
-        {/* Dialog per aggiungere nuovo giocatore */}
-        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-          <DialogTitle>Segnala nuovo giocatore</DialogTitle>
-          <DialogContent>
+      {/* Dialog Dettagli/Modifica */}
+      <Dialog
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        fullWidth
+        maxWidth="md"
+        disableEscapeKeyDown={editMode}
+        disableBackdropClick={editMode}
+      >
+        <DialogTitle>{editMode ? 'Modifica Giocatore' : 'Dettagli Giocatore'}</DialogTitle>
+        <DialogContent>
+          {editMode ? (
             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
-              <form id="segnala-form" onSubmit={handleSubmit}>
+              <form id="edit-form" onSubmit={handleEdit}>
                 <Stack spacing={2} mt={1}>
-                  <TextField label="Nome" name="nome" value={form.nome} onChange={handleChange} fullWidth />
-                  <TextField label="Cognome" name="cognome" value={form.cognome} onChange={handleChange} fullWidth />
-                  <TextField label="Squadra" name="squadra" value={form.squadra} onChange={handleChange} required fullWidth />
-                  <TextField label="Anno di nascita" name="anno_nascita" value={form.anno_nascita} onChange={handleChange} required type="number" fullWidth />
-                  <TextField label="Numero maglia" name="numero_maglia" value={form.numero_maglia} onChange={handleChange} required type="number" fullWidth />
-                  <TextField label="Struttura fisica" name="struttura_fisica" value={form.struttura_fisica} onChange={handleChange} fullWidth />
-                  <TextField select label="Piede" name="piede" value={form.piede} onChange={handleChange} fullWidth>
+                  <TextField label="Nome" name="nome" value={editForm.nome} onChange={handleEditChange} fullWidth />
+                  <TextField label="Cognome" name="cognome" value={editForm.cognome} onChange={handleEditChange} fullWidth />
+                  <TextField label="Squadra" name="squadra" value={editForm.squadra} onChange={handleEditChange} required fullWidth />
+                  <TextField label="Anno di nascita" name="anno_nascita" value={editForm.anno_nascita} onChange={handleEditChange} required type="number" fullWidth />
+                  <TextField label="Numero maglia" name="numero_maglia" value={editForm.numero_maglia} onChange={handleEditChange} required type="number" fullWidth />
+                  <TextField label="Struttura fisica" name="struttura_fisica" value={editForm.struttura_fisica} onChange={handleEditChange} fullWidth />
+                  <TextField select label="Piede" name="piede" value={editForm.piede} onChange={handleEditChange} fullWidth>
                     <MenuItem value="">-</MenuItem>
                     {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
                   </TextField>
-                  <TextField label="Capacità fisica" name="capacita_fisica" value={form.capacita_fisica} onChange={handleChange} fullWidth />
-                  <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={form.capacita_cognitiva} onChange={handleChange} fullWidth />
-                  <TextField select label="Ruolo" name="ruolo" value={form.ruolo} onChange={handleChange} required fullWidth>
+                  <TextField select label="Ruolo" name="ruolo" value={editForm.ruolo} onChange={handleEditChange} required fullWidth>
                     <MenuItem value="">-</MenuItem>
                     {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
                   </TextField>
-                  <TextField label="Descrizione match" name="descrizione_match" value={form.descrizione_match} onChange={handleChange} multiline rows={3} fullWidth />
+                  <TextField label="Capacità fisica" name="capacita_fisica" value={editForm.capacita_fisica} onChange={handleEditChange} fullWidth />
+                  <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={editForm.capacita_cognitiva} onChange={handleEditChange} fullWidth />
+                  <TextField label="Descrizione match" name="descrizione_match" value={editForm.descrizione_match} onChange={handleEditChange} multiline rows={3} fullWidth />
                   <TextField
                     label="Giorno in cui l'hai visto"
                     name="data_segnalazione"
                     type="date"
-                    value={form.data_segnalazione}
-                    onChange={handleChange}
+                    value={editForm.data_segnalazione}
+                    onChange={handleEditChange}
                     required
                     InputLabelProps={{ shrink: true }}
                     fullWidth
@@ -563,31 +438,207 @@ function Segnalati() {
                   <TextField
                     label="Numero cellulare genitore"
                     name="telefono_genitore"
-                    value={form.telefono_genitore}
-                    onChange={handleChange}
+                    value={editForm.telefono_genitore}
+                    onChange={handleEditChange}
                     placeholder="+39XXXXXXXXX"
                     helperText="Formato: +39 seguito da 9-12 cifre"
                     fullWidth
                   />
                   <Button variant="outlined" component="label">
                     Carica Note Gara (PDF, max 2MB)
-                    <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
+                    <input type="file" accept="application/pdf" hidden onChange={handleEditFileChange} />
                   </Button>
-                  {form.note_gara && <Typography variant="body2">File selezionato: {form.note_gara.name}</Typography>}
-                  {error && <Alert severity="error">{error}</Alert>}
-                  {success && <Alert severity="success">{success}</Alert>}
+                  {editForm.note_gara && <Typography variant="body2">File selezionato: {editForm.note_gara.name}</Typography>}
                 </Stack>
               </form>
             </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Annulla</Button>
-            <Button type="submit" form="segnala-form" variant="contained">Salva</Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
+          ) : (
+            <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+              <Stack spacing={2}>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Nome:</Typography>
+                  <Typography>{selectedGiocatore?.nome || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Cognome:</Typography>
+                  <Typography>{selectedGiocatore?.cognome || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Squadra:</Typography>
+                  <Typography>{selectedGiocatore?.squadra}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Anno di nascita:</Typography>
+                  <Typography>{selectedGiocatore?.anno_nascita}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Numero maglia:</Typography>
+                  <Typography>{selectedGiocatore?.numero_maglia}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Ruolo:</Typography>
+                  <Typography>{selectedGiocatore?.ruolo}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Piede:</Typography>
+                  <Typography>{selectedGiocatore?.piede || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Struttura fisica:</Typography>
+                  <Typography>{selectedGiocatore?.struttura_fisica || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Capacità fisica:</Typography>
+                  <Typography>{selectedGiocatore?.capacita_fisica || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Capacità cognitiva:</Typography>
+                  <Typography>{selectedGiocatore?.capacita_cognitiva || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Giorno in cui l'hai visto:</Typography>
+                  <Typography>{selectedGiocatore?.data_segnalazione}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#ffffff' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Telefono genitore:</Typography>
+                  <Typography>{selectedGiocatore?.telefono_genitore || '-'}</Typography>
+                </Box>
+                <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
+                  <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
+                  <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
+                </Box>
+                {selectedGiocatore?.note_gara && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" fontWeight="bold">Note Gara:</Typography>
+                    <a href={selectedGiocatore.note_gara} target="_blank" rel="noopener noreferrer">Visualizza PDF</a>
+                  </Box>
+                )}
+              </Stack>
+            </Box>
+          )}
+          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+          {editMode ? (
+            <>
+              <Button type="button" onClick={() => setEditMode(false)}>Annulla</Button>
+              <Button type="submit" form="edit-form" variant="contained">Salva Modifiche</Button>
+            </>
+          ) : (
+            <>
+              <Button color="error" onClick={() => setDeleteConfirmOpen(true)}>Elimina Giocatore</Button>
+              <Button
+                type="button"
+                onClick={e => { e.preventDefault(); e.stopPropagation(); setEditMode(true); }}
+              >
+                Modifica
+              </Button>
+              <Button type="button" color="primary" onClick={() => setConvertiDialogOpen(true)}>Passa a Visionato</Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog conversione */}
+      <Dialog open={convertiDialogOpen} onClose={() => setConvertiDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Converti in Visionato</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Inserisci il numero di cellulare del genitore per completare la conversione:
+          </DialogContentText>
+          <TextField
+            label="Numero cellulare genitore"
+            value={telefonoGenitore}
+            onChange={e => setTelefonoGenitore(e.target.value)}
+            fullWidth
+            placeholder="+39XXXXXXXXX"
+            helperText="Formato: +39 seguito da 9-12 cifre"
+          />
+          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConvertiDialogOpen(false)}>Annulla</Button>
+          <Button onClick={handlePassaAVisionato} variant="contained" color="primary">Conferma Conversione</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog conferma eliminazione */}
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle sx={{ color: 'error.main' }}>Conferma Eliminazione</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Sei sicuro di voler eliminare questo giocatore? Questa azione non può essere annullata.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Annulla</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">Elimina</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog nuovo giocatore */}
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>Segnala nuovo giocatore</DialogTitle>
+        <DialogContent>
+          <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+            <form id="segnala-form" onSubmit={handleSubmit}>
+              <Stack spacing={2} mt={1}>
+                <TextField label="Nome" name="nome" value={form.nome} onChange={handleChange} fullWidth />
+                <TextField label="Cognome" name="cognome" value={form.cognome} onChange={handleChange} fullWidth />
+                <TextField label="Squadra" name="squadra" value={form.squadra} onChange={handleChange} required fullWidth />
+                <TextField label="Anno di nascita" name="anno_nascita" value={form.anno_nascita} onChange={handleChange} required type="number" fullWidth />
+                <TextField label="Numero maglia" name="numero_maglia" value={form.numero_maglia} onChange={handleChange} required type="number" fullWidth />
+                <TextField label="Struttura fisica" name="struttura_fisica" value={form.struttura_fisica} onChange={handleChange} fullWidth />
+                <TextField select label="Piede" name="piede" value={form.piede} onChange={handleChange} fullWidth>
+                  <MenuItem value="">-</MenuItem>
+                  {PIEDI.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
+                </TextField>
+                <TextField label="Capacità fisica" name="capacita_fisica" value={form.capacita_fisica} onChange={handleChange} fullWidth />
+                <TextField label="Capacità cognitiva" name="capacita_cognitiva" value={form.capacita_cognitiva} onChange={handleChange} fullWidth />
+                <TextField select label="Ruolo" name="ruolo" value={form.ruolo} onChange={handleChange} required fullWidth>
+                  <MenuItem value="">-</MenuItem>
+                  {RUOLI.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                </TextField>
+                <TextField label="Descrizione match" name="descrizione_match" value={form.descrizione_match} onChange={handleChange} multiline rows={3} fullWidth />
+                <TextField
+                  label="Giorno in cui l'hai visto"
+                  name="data_segnalazione"
+                  type="date"
+                  value={form.data_segnalazione}
+                  onChange={handleChange}
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                />
+                <TextField
+                  label="Numero cellulare genitore"
+                  name="telefono_genitore"
+                  value={form.telefono_genitore}
+                  onChange={handleChange}
+                  placeholder="+39XXXXXXXXX"
+                  helperText="Formato: +39 seguito da 9-12 cifre"
+                  fullWidth
+                />
+                <Button variant="outlined" component="label">
+                  Carica Note Gara (PDF, max 2MB)
+                  <input type="file" accept="application/pdf" hidden onChange={handleFileChange} />
+                </Button>
+                {form.note_gara && <Typography variant="body2">File selezionato: {form.note_gara.name}</Typography>}
+                {error && <Alert severity="error">{error}</Alert>}
+                {success && <Alert severity="success">{success}</Alert>}
+              </Stack>
+            </form>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Annulla</Button>
+          <Button type="submit" form="segnala-form" variant="contained">Salva</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
 
-export default Segnalati; 
+export default Segnalati;
