@@ -264,8 +264,20 @@ function Ricerca() {
                     placeholder="es. 2005"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth>
+
+                <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
+                  <FormControl
+                    fullWidth
+                    variant="outlined"
+                    sx={{
+                      width: '100%',
+                      minWidth: { xs: '100%', sm: 100 },      // allarga il box
+                      '& .MuiInputLabel-root': { fontSize: '1rem' },
+                      '& .MuiInputBase-root': { height: 56, borderRadius: 1 },
+                      '& .MuiOutlinedInput-root': { width: '100%' },
+                      '& .MuiSelect-select': { display: 'flex', alignItems: 'center', py: 1.5 }
+                    }}
+                  >
                     <InputLabel>Ruolo</InputLabel>
                     <Select
                       value={filters.ruolo}
@@ -279,8 +291,20 @@ function Ricerca() {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <FormControl fullWidth>
+
+                <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
+                  <FormControl
+                    fullWidth
+                    variant="outlined"
+                    sx={{
+                      width: '100%',
+                      minWidth: { xs: '100%', sm: 90 },      // allarga il box
+                      '& .MuiInputLabel-root': { fontSize: '1rem' },
+                      '& .MuiInputBase-root': { height: 56, borderRadius: 1 },
+                      '& .MuiOutlinedInput-root': { width: '100%' },
+                      '& .MuiSelect-select': { display: 'flex', alignItems: 'center', py: 1.5 }
+                    }}
+                  >
                     <InputLabel>Piede</InputLabel>
                     <Select
                       value={filters.piede}
@@ -294,6 +318,7 @@ function Ricerca() {
                     </Select>
                   </FormControl>
                 </Grid>
+
                 <Grid item xs={12} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Tipo</InputLabel>
