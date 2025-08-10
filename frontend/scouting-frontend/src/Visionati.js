@@ -175,23 +175,33 @@ function Visionati() {
 
   const handleEditChange = e => setEditForm({ ...editForm, [e.target.name]: e.target.value });
 
-  const handleEdit = async e => {
-    e.preventDefault();
+  const handleEdit = async (e) => { e.preventDefault();
     try {
       const formData = new FormData();
+
       Object.entries(editForm).forEach(([key, value]) => {
+        if (key === 'note_gara') {
+          // Aggiungi il campo SOLO se è un vero File (nuovo upload)
+          if (value && value instanceof File) {
+            formData.append('note_gara', value);
+          }
+          return; // non appendere l'URL stringa
+        }
         if (value !== null && value !== undefined) {
           formData.append(key, value);
         }
       });
+
       await axios.put(`http://127.0.0.1:8000/api/visionati/${selectedGiocatore.id}/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
       setSuccess('Giocatore modificato con successo!');
       fetchVisionati();
       setEditMode(false);
       setDetailOpen(false);
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Errore nella modifica:', err);
       if (err.response && err.response.data) {
         setError(typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data));
@@ -200,6 +210,7 @@ function Visionati() {
       }
     }
   };
+
 
   const handleDelete = async () => {
     try {
