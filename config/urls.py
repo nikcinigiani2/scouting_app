@@ -23,11 +23,15 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 
 
+def healthz(_request):
+    return JsonResponse({"status": "ok"})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("healthz/", healthz),
     path('api/', include('apps.scouting.urls')),  # Tutte le API sono sotto /api/
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
