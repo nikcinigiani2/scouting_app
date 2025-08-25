@@ -154,12 +154,7 @@ export default function HomePage() {
         >
           Benvenuto, {username}
         </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ color: 'rgba(255,255,255,0.85)', mb: 4 }}
-        >
-          Scegli la sezione:
-        </Typography>
+
 
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
