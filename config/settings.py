@@ -90,14 +90,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 import os
 import dj_database_url
 
-_db_url = os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3")
 DATABASES = {
     "default": dj_database_url.parse(
-        _db_url,
+        os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3"),
         conn_max_age=600,
         ssl_require=os.environ.get("DB_SSL_REQUIRE", "true").lower() == "true",
     )
