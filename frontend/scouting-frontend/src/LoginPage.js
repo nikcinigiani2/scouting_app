@@ -10,7 +10,7 @@ import {
   Alert
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
-import api, { setTokens } from './utils/auth';
+import api, { setTokens, getUser } from "./utils/auth";
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 
@@ -27,25 +27,24 @@ export default function LoginPage({ onLoginSuccess }) {
       setLoading(true);
 
       try {
-        // endpoint JWT standard di SimpleJWT: /api/token/
-        const { data } = await api.post('/token/', { username, password });
-
-        // salva i token (e l'utente se lo restituisci da qualche endpoint successivo)
+        const { data } = await api.post("/token/", { username, password });
         setTokens(data.access, data.refresh);
 
-        if (onLoginSuccess) onLoginSuccess(getUser?.()); // opzionale se gestisci lo user a parte
-        navigate('/home', { replace: true });
+        const user = getUser?.();          // se avevi salvato lo user altrove
+        onLoginSuccess?.(user);             // opzionale
+        navigate("/home", { replace: true });
       } catch (err) {
-        console.error('Errore login:', err);
+        console.error("Errore login:", err);
         const msg =
           err.response?.data?.detail ||
           err.response?.data?.error ||
-          'Credenziali non valide o errore di connessione';
+          "Credenziali non valide o errore di connessione";
         setError(msg);
       } finally {
         setLoading(false);
       }
     };
+
 
 
   return (
