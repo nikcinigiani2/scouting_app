@@ -10,8 +10,7 @@ import {
   Alert
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
-import { setTokens } from './utils/auth';
-import axios from './utils/auth';
+import api, { setTokens } from './utils/auth';
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 
@@ -23,28 +22,31 @@ export default function LoginPage({ onLoginSuccess }) {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
-        username,
-        password
-      });
-      setTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-        response.data.user
-      );
-      if (onLoginSuccess) onLoginSuccess(response.data.user);
-      navigate('/home', { replace: true });
-    } catch (err) {
-      console.error('Errore login:', err);
-      setError(err.response?.data?.error || 'Credenziali non valide o errore di connessione');
-    } finally {
-      setLoading(false);
-    }
-  };
+      e.preventDefault();
+      setError(null);
+      setLoading(true);
+
+      try {
+        // endpoint JWT standard di SimpleJWT: /api/token/
+        const { data } = await api.post('/token/', { username, password });
+
+        // salva i token (e l'utente se lo restituisci da qualche endpoint successivo)
+        setTokens(data.access, data.refresh);
+
+        if (onLoginSuccess) onLoginSuccess(getUser?.()); // opzionale se gestisci lo user a parte
+        navigate('/home', { replace: true });
+      } catch (err) {
+        console.error('Errore login:', err);
+        const msg =
+          err.response?.data?.detail ||
+          err.response?.data?.error ||
+          'Credenziali non valide o errore di connessione';
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
   return (
     <Box
