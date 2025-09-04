@@ -21,7 +21,7 @@ import {
   DialogContentText,
   Grid
 } from '@mui/material';
-import axios from './utils/auth';
+import api from "./utils/auth";
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import logoFloria from './assets/logo_floria.png';
@@ -71,7 +71,7 @@ function Segnalati() {
   const fetchSegnalati = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://127.0.0.1:8000/api/segnalati/');
+      const res = await api.get('/segnalati/');
       setSegnalati(res.data);
     } catch (err) {
       console.error('Errore nel recupero dei segnalati:', err);
@@ -131,8 +131,8 @@ function Segnalati() {
       Object.entries(form).forEach(([k, v]) => {
         if (v !== null && v !== undefined) formData.append(k, v);
       });
-      await axios.post('http://127.0.0.1:8000/api/segnalati/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      await api.post('/segnalati/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('Giocatore segnalato con successo!');
       fetchSegnalati();
@@ -182,8 +182,8 @@ function Segnalati() {
           formData.append(k, v);
         }
       });
-      await axios.put(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      await api.put(`/segnalati/${selectedGiocatore.id}/`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('Giocatore modificato con successo!');
       fetchSegnalati();
@@ -201,7 +201,8 @@ function Segnalati() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/segnalati/${selectedGiocatore.id}/`);
+      await api.delete(`/segnalati/${selectedGiocatore.id}/`);
+
       setSuccess('Giocatore eliminato con successo!');
       fetchSegnalati();
       setDeleteConfirmOpen(false);
@@ -214,7 +215,7 @@ function Segnalati() {
 
   const handlePassaAVisionato = async () => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/converti/${selectedGiocatore.id}/`, {
+      await api.post(`/converti/${selectedGiocatore.id}/`, {
         descrizione_dettagliata: editForm.descrizione_match,
         telefono_genitore: telefonoGenitore
       });

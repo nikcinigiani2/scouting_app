@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import axios from './utils/auth';
+import api from "./utils/auth";
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 import { clearTokens } from './utils/auth';
@@ -71,7 +71,7 @@ function Visionati() {
   const fetchVisionati = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://127.0.0.1:8000/api/visionati/');
+      const res = await api.get('/visionati/');
       setVisionati(res.data);
     } catch (err) {
       console.error('Errore nel recupero dei visionati:', err);
@@ -133,8 +133,8 @@ function Visionati() {
           formData.append(key, value);
         }
       });
-      await axios.post('http://127.0.0.1:8000/api/visionati/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      await api.post('/visionati/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('Giocatore visionato aggiunto con successo!');
       fetchVisionati();
@@ -192,7 +192,7 @@ function Visionati() {
         }
       });
 
-      await axios.put(`http://127.0.0.1:8000/api/visionati/${selectedGiocatore.id}/`, formData, {
+      await api.put(`/visionati/${selectedGiocatore.id}/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -214,7 +214,7 @@ function Visionati() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/visionati/${selectedGiocatore.id}/`);
+      await api.delete(`/visionati/${selectedGiocatore.id}/`);
       setSuccess('Giocatore eliminato con successo!');
       fetchVisionati();
       setDeleteConfirmOpen(false);

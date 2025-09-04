@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from './utils/auth';
+import api from "./utils/auth";
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 import { clearTokens } from './utils/auth';
@@ -58,7 +58,7 @@ export default function NoteAnnoPage() {
     try {
       const params = { anno, ordering: order };
       if (search) params.search = search;
-      const res = await axios.get('http://127.0.0.1:8000/api/note/', { params });
+      const res = await api.get('/note/', { params });
       setFiles(res.data);
     } catch {
       setError('Errore nel caricamento dei file');
@@ -109,9 +109,8 @@ export default function NoteAnnoPage() {
       formData.append('anno', anno);
       formData.append('file', file);
       formData.append('nome', file.name);
-      await axios.post('http://127.0.0.1:8000/api/note/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await api.post('/note/', formData, {headers: { 'Content-Type': 'multipart/form-data' },
+     });
       setSuccess('File caricato con successo!');
       setFile(null);
       fetchFiles();
@@ -125,8 +124,7 @@ export default function NoteAnnoPage() {
   const handleDelete = async id => {
     if (!window.confirm('Vuoi eliminare questo file?')) return;
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/note/${id}/`);
-      fetchFiles();
+      await api.delete(`/note/${id}/`);
     } catch {
       setError("Errore nell'eliminazione del file");
     }

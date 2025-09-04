@@ -30,7 +30,7 @@ import {
 import { Search, FilterList, ExpandMore, Person, Visibility } from '@mui/icons-material';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import axios from './utils/auth';
+import api from "./utils/auth";
 import logoFloria from './assets/logo_floria.png';
 import abstractBackground from './assets/abstract-blue-bg.png';
 import { clearTokens } from './utils/auth';
@@ -70,7 +70,7 @@ function Ricerca() {
       if (filters.ruolo) params.append('ruolo', filters.ruolo);
       if (filters.piede) params.append('piede', filters.piede);
       if (filters.tipo !== 'tutti') params.append('tipo', filters.tipo);
-      const response = await axios.get(`http://127.0.0.1:8000/api/ricerca/?${params}`);
+      const response = await api.get(`/ricerca/?${params}`);
       setResults(response.data);
     } catch (err) {
       console.error('Errore nella ricerca:', err);
