@@ -53,18 +53,10 @@ export default function NoteRefertiPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting Manager
+              Floria S.M.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button
-              component="button"
-              onClick={() => nav('/dashboard')}
-              variant="text"
-              sx={{ color: '#1565c0', textTransform: 'none' }}
-            >
-              Scouting
-            </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -89,8 +81,8 @@ export default function NoteRefertiPage() {
           startIcon={<ArrowBack />}
           //onClick={handleBack}
           component={Link}
-            to="/home"
-            variant="outlined"
+          to="/home"
+          variant="outlined"
           sx={{
             bgcolor: 'rgba(255,255,255,0.9)',
             color: '#1565c0',

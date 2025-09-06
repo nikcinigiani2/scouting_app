@@ -181,11 +181,10 @@ function Visionati() {
 
       Object.entries(editForm).forEach(([key, value]) => {
         if (key === 'note_gara') {
-          // Aggiungi il campo SOLO se è un vero File (nuovo upload)
           if (value && value instanceof File) {
             formData.append('note_gara', value);
           }
-          return; // non appendere l'URL stringa
+          return;
         }
         if (value !== null && value !== undefined) {
           formData.append(key, value);
@@ -255,16 +254,10 @@ function Visionati() {
           <Box onClick={() => navigate('/home')} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40, marginRight: 8 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting
+              Floria S.M.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button onClick={() => navigate('/notereferti')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Note & Referti
-            </Button>
-            <Button onClick={() => navigate('/dashboard')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Scouting
-            </Button>
+          <Box sx={{ display: 'flex' }}>
             <Button
               onClick={handleLogout}
               variant="outlined"

@@ -257,16 +257,10 @@ function Segnalati() {
           <Box onClick={() => navigate('/home')} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40, marginRight: 8 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting
+              Floria S.M.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button onClick={() => navigate('/notereferti')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Note & Referti
-            </Button>
-            <Button onClick={() => navigate('/dashboard')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Scouting
-            </Button>
+          <Box sx={{ display: 'flex' }}>
             <Button
               onClick={handleLogout}
               variant="outlined"

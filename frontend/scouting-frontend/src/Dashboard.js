@@ -93,16 +93,12 @@ export default function Dashboard() {
           <Box component={Link} to="/home" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40, marginRight: 8 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting
+              Floria S.M.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button component={Link} to="/notereferti" variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Note & Referti
-            </Button>
-            <Button component={Link} to="/dashboard" variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Scouting
-            </Button>
+
+          {/* Azioni: sempre e solo Logout */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -125,11 +121,9 @@ export default function Dashboard() {
       <Box sx={{ pt: 10, px: 2 }}>
         <Button
           startIcon={<ArrowBackIcon />}
-          //onClick={handleBack}
-            //vorrei che onClick tornasse alla home page
-            component={Link}
-            to="/home"
-            variant="outlined"
+          component={Link}
+          to="/home"
+          variant="outlined"
           sx={{
             bgcolor: 'rgba(255,255,255,0.9)',
             color: '#1565c0',
@@ -159,7 +153,7 @@ export default function Dashboard() {
         Scouting
       </Typography>
 
-      {/* Cards in a single column, wrapped narrower */}
+      {/* Cards */}
       <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4 }, pb: 4 }}>
         <Paper
           elevation={2}

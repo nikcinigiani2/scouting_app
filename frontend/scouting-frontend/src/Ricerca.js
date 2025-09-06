@@ -139,16 +139,10 @@ function Ricerca() {
           <Box onClick={() => navigate('/home')} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40, marginRight: 8 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting
+              Floria S.M.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button onClick={() => navigate('/notereferti')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Note & Referti
-            </Button>
-            <Button onClick={() => navigate('/dashboard')} variant="text" sx={{ color: '#1565c0', textTransform: 'none' }}>
-              Scouting
-            </Button>
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -271,7 +265,7 @@ function Ricerca() {
                     variant="outlined"
                     sx={{
                       width: '100%',
-                      minWidth: { xs: '100%', sm: 100 },      // allarga il box
+                      minWidth: { xs: '100%', sm: 100 },
                       '& .MuiInputLabel-root': { fontSize: '1rem' },
                       '& .MuiInputBase-root': { height: 56, borderRadius: 1 },
                       '& .MuiOutlinedInput-root': { width: '100%' },
@@ -298,7 +292,7 @@ function Ricerca() {
                     variant="outlined"
                     sx={{
                       width: '100%',
-                      minWidth: { xs: '100%', sm: 90 },      // allarga il box
+                      minWidth: { xs: '100%', sm: 90 },
                       '& .MuiInputLabel-root': { fontSize: '1rem' },
                       '& .MuiInputBase-root': { height: 56, borderRadius: 1 },
                       '& .MuiOutlinedInput-root': { width: '100%' },
@@ -342,7 +336,6 @@ function Ricerca() {
             </AccordionDetails>
           </Accordion>
 
-          {/* Statistiche risultati */}
           {results.count_totale > 0 && (
             <Box sx={{ mb: 3 }}>
               <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
@@ -353,10 +346,8 @@ function Ricerca() {
             </Box>
           )}
 
-          {/* Messaggi di errore */}
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          {/* Risultati della ricerca */}
           {results.tutti.length > 0 ? (
             <Grid container spacing={2}>
               {results.tutti.map((giocatore) => (
@@ -416,7 +407,6 @@ function Ricerca() {
             </Box>
           )}
 
-          {/* Dialog dettagli giocatore */}
           <Dialog
             open={detailOpen}
             onClose={() => setDetailOpen(false)}

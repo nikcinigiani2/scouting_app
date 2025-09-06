@@ -155,7 +155,7 @@ export default function NoteAnnoPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <img src={logoFloria} alt="Floria" style={{ height: 40 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
-              Floria Scouting Manager
+              Floria S.M.
             </Typography>
           </Box>
           <Button onClick={handleLogout} variant="outlined"
