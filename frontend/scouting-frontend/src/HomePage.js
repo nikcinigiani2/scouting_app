@@ -19,17 +19,14 @@ export default function HomePage() {
   const nav = useNavigate();
   const location = useLocation();
 
-  // Leggi nome utente dallo storage
   const stored = JSON.parse(localStorage.getItem('user') || '{}');
   const username = stored.first_name || stored.username || 'utente';
 
-  // Logout senza Context
   const handleLogout = () => {
     clearTokens();
     nav('/login', { replace: true });
   };
 
-  // Mostra il bottone “indietro” se in /notereferti
   const showBack = location.pathname.startsWith('/notereferti');
   const backTo = showBack ? '/notereferti' : '/home';
 
@@ -94,7 +91,14 @@ export default function HomePage() {
             </Link>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+          {/* Navbar desktop/tablet */}
+          <Box
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center',
+              gap: 2
+            }}
+          >
             <Button
               component={Link}
               to="/notereferti"
@@ -103,7 +107,6 @@ export default function HomePage() {
             >
               Note & Referti
             </Button>
-            {/* RIMOSSO: pulsante "Scouting" dalla navbar */}
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -112,7 +115,30 @@ export default function HomePage() {
                 color: '#1565c0',
                 borderRadius: '999px',
                 textTransform: 'none',
-                px: { xs: 1.5, sm: 2 },
+                px: 2,
+                '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+
+          {/* Navbar mobile */}
+          <Box
+            sx={{
+              display: { xs: 'flex', sm: 'none' },
+              alignItems: 'center'
+            }}
+          >
+            <Button
+              onClick={handleLogout}
+              variant="outlined"
+              sx={{
+                borderColor: '#1565c0',
+                color: '#1565c0',
+                borderRadius: '999px',
+                textTransform: 'none',
+                px: 2,
                 '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
               }}
             >
@@ -122,6 +148,7 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
+      {/* --- CONTENUTO --- */}
       <Box
         sx={{
           position: 'relative',
