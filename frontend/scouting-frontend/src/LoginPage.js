@@ -22,30 +22,59 @@ export default function LoginPage({ onLoginSuccess }) {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
-      setError(null);
-      setLoading(true);
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
+    try {
+      const { data } = await api.post("/token/", { username, password });
+      setTokens(data.access, data.refresh);
+
+      // --- NUOVO: salva sempre l'utente in localStorage ---
+      let userObj = null;
+
+      // 1) prova a usare un eventuale helper esistente
       try {
-        const { data } = await api.post("/token/", { username, password });
-        setTokens(data.access, data.refresh);
+        if (typeof getUser === 'function') {
+          userObj = await getUser();
+        }
+      } catch {}
 
-        const user = getUser?.();          // se avevi salvato lo user altrove
-        onLoginSuccess?.(user);             // opzionale
-        navigate("/home", { replace: true });
-      } catch (err) {
-        console.error("Errore login:", err);
-        const msg =
-          err.response?.data?.detail ||
-          err.response?.data?.error ||
-          "Credenziali non valide o errore di connessione";
-        setError(msg);
-      } finally {
-        setLoading(false);
+      // 2) tenta alcuni endpoint comuni del profilo
+      if (!userObj) {
+        const candidates = ["/me/", "/users/me/", "/profile/", "/api/me/"];
+        for (const ep of candidates) {
+          try {
+            const resp = await api.get(ep);
+            if (resp?.data) {
+              userObj = resp.data;
+              break;
+            }
+          } catch {}
+        }
       }
-    };
 
+      // 3) fallback sicuro: almeno lo username del form
+      if (!userObj) {
+        userObj = { username };
+      }
 
+      localStorage.setItem("user", JSON.stringify(userObj));
+      // ----------------------------------------------------
+
+      onLoginSuccess?.(userObj);
+      navigate("/home", { replace: true });
+    } catch (err) {
+      console.error("Errore login:", err);
+      const msg =
+        err.response?.data?.detail ||
+        err.response?.data?.error ||
+        "Credenziali non valide o errore di connessione";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box
@@ -68,7 +97,7 @@ export default function LoginPage({ onLoginSuccess }) {
           width: 500,
           maxWidth: '90%',
           borderRadius: 4,
-          bgcolor: '#ffffff',        // stesso colore di sfondo del logo
+          bgcolor: '#ffffff',
           textAlign: 'center'
         }}
       >
@@ -81,11 +110,11 @@ export default function LoginPage({ onLoginSuccess }) {
           <Typography
             variant="h5"
             gutterBottom
-            sx={{ fontWeight: 700, color: '#ffffff' }}
+            sx={{ fontWeight: 700, color: '#1565c0' }}
           >
             Floria Scouting Manager
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Accedi al tuo account
           </Typography>
         </Box>
@@ -99,11 +128,7 @@ export default function LoginPage({ onLoginSuccess }) {
             margin="dense"
             required
             disabled={loading}
-            sx={{
-              mb: 2,
-              bgcolor: '#ffffff',
-              borderRadius: 1
-            }}
+            sx={{ mb: 2, bgcolor: '#ffffff', borderRadius: 1 }}
           />
           <TextField
             label="Password"
@@ -114,11 +139,7 @@ export default function LoginPage({ onLoginSuccess }) {
             margin="dense"
             required
             disabled={loading}
-            sx={{
-              mb: 2,
-              bgcolor: '#ffffff',
-              borderRadius: 1
-            }}
+            sx={{ mb: 2, bgcolor: '#ffffff', borderRadius: 1 }}
           />
           {error && (
             <Alert severity="error" sx={{ mt: 2, mb: 2 }}>

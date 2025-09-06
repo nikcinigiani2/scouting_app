@@ -19,8 +19,20 @@ export default function HomePage() {
   const nav = useNavigate();
   const location = useLocation();
 
-  const stored = JSON.parse(localStorage.getItem('user') || '{}');
-  const username = stored.first_name || stored.username || 'utente';
+  // Lettura utente robusta
+  const safeParse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+  const storedUser =
+    safeParse(localStorage.getItem('user')) ||
+    safeParse(localStorage.getItem('user_data')) ||
+    safeParse(localStorage.getItem('profile')) ||
+    {};
+  const username =
+    storedUser.first_name ||
+    storedUser.firstName ||
+    storedUser.name ||
+    storedUser.username ||
+    (storedUser.email ? storedUser.email.split('@')[0] : '') ||
+    'utente';
 
   const handleLogout = () => {
     clearTokens();
@@ -91,7 +103,7 @@ export default function HomePage() {
             </Link>
           </Box>
 
-          {/* Navbar desktop/tablet */}
+          {/* Desktop/tablet: lasciamo Note & Referti + Logout */}
           <Box
             sx={{
               display: { xs: 'none', sm: 'flex' },
@@ -123,7 +135,7 @@ export default function HomePage() {
             </Button>
           </Box>
 
-          {/* Navbar mobile */}
+          {/* Mobile: SOLO Logout (come richiesto) */}
           <Box
             sx={{
               display: { xs: 'flex', sm: 'none' },
@@ -148,7 +160,7 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* --- CONTENUTO --- */}
+      {/* Contenuto */}
       <Box
         sx={{
           position: 'relative',
