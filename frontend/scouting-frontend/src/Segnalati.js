@@ -132,7 +132,7 @@ function Segnalati() {
         if (v !== null && v !== undefined) formData.append(k, v);
       });
       await api.post('/segnalati/', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('Giocatore segnalato con successo!');
       fetchSegnalati();
@@ -183,7 +183,7 @@ function Segnalati() {
         }
       });
       await api.put(`/segnalati/${selectedGiocatore.id}/`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSuccess('Giocatore modificato con successo!');
       fetchSegnalati();
@@ -202,7 +202,6 @@ function Segnalati() {
   const handleDelete = async () => {
     try {
       await api.delete(`/segnalati/${selectedGiocatore.id}/`);
-
       setSuccess('Giocatore eliminato con successo!');
       fetchSegnalati();
       setDeleteConfirmOpen(false);
@@ -233,6 +232,23 @@ function Segnalati() {
   const handleLogout = () => {
     clearTokens();
     navigate('/login', { replace: true });
+  };
+
+  // NUOVO: apertura PDF con token
+  const openPdf = async (fileUrl) => {
+    try {
+      const base = (api.defaults?.baseURL || '').replace(/\/+$/, '');
+      const path = fileUrl?.startsWith('http') ? fileUrl.replace(base, '') : fileUrl;
+
+      const res = await api.get(path, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (err) {
+      console.error('Errore apertura PDF:', err);
+      setError('Impossibile aprire il PDF. Controlla il file o riprova.');
+    }
   };
 
   return (
@@ -502,10 +518,18 @@ function Segnalati() {
                   <Typography variant="subtitle2" fontWeight="bold">Descrizione match:</Typography>
                   <Typography>{selectedGiocatore?.descrizione_match || '-'}</Typography>
                 </Box>
+
+                {/* NUOVO: apertura PDF con token */}
                 {selectedGiocatore?.note_gara && (
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold">Note Gara:</Typography>
-                    <a href={selectedGiocatore.note_gara} target="_blank" rel="noopener noreferrer">Visualizza PDF</a>
+                    <Button
+                      onClick={() => openPdf(selectedGiocatore.note_gara)}
+                      variant="outlined"
+                      size="small"
+                    >
+                      Visualizza PDF
+                    </Button>
                   </Box>
                 )}
               </Stack>

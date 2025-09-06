@@ -109,8 +109,9 @@ export default function NoteAnnoPage() {
       formData.append('anno', anno);
       formData.append('file', file);
       formData.append('nome', file.name);
-      await api.post('/note/', formData, {headers: { 'Content-Type': 'multipart/form-data' },
-     });
+      await api.post('/note/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setSuccess('File caricato con successo!');
       setFile(null);
       fetchFiles();
@@ -125,14 +126,28 @@ export default function NoteAnnoPage() {
     if (!window.confirm('Vuoi eliminare questo file?')) return;
     try {
       await api.delete(`/note/${id}/`);
+      // ricarica lista
+      fetchFiles();
     } catch {
       setError("Errore nell'eliminazione del file");
     }
   };
 
-  const handleDownload = fileUrl => {
-    const url = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
-    window.open(url, '_blank');
+  // NUOVO: apertura PDF con token
+  const openPdf = async (fileUrl) => {
+    try {
+      const base = (api.defaults?.baseURL || '').replace(/\/+$/, '');
+      const path = fileUrl?.startsWith('http') ? fileUrl.replace(base, '') : fileUrl;
+
+      const res = await api.get(path, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (err) {
+      console.error('Errore apertura PDF:', err);
+      setError('Impossibile aprire il PDF. Controlla il file o riprova.');
+    }
   };
 
   return (
@@ -152,7 +167,7 @@ export default function NoteAnnoPage() {
       <AppBar position="absolute" color="transparent" elevation={0}
         sx={{ bgcolor: 'rgba(255,255,255,0.9)', zIndex: theme => theme.zIndex.drawer + 1 }}>
         <Toolbar disableGutters sx={{ px: 2, height: 64, display: 'flex', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }} onClick={() => nav('/home')}>
             <img src={logoFloria} alt="Floria" style={{ height: 40 }} />
             <Typography variant="h6" sx={{ color: '#1565c0', fontWeight: 700 }}>
               Floria S.M.
@@ -265,7 +280,7 @@ export default function NoteAnnoPage() {
                     key={f.id}
                     secondaryAction={
                       <Box>
-                        <IconButton onClick={() => handleDownload(f.file)}
+                        <IconButton onClick={() => openPdf(f.file)}
                           sx={{ color: 'primary.main', bgcolor: '#fff !important', mr: 1 }}>
                           <CloudDownload />
                         </IconButton>
