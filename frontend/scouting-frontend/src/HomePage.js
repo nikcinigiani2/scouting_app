@@ -89,12 +89,12 @@ export default function HomePage() {
                 variant="h6"
                 sx={{ color: '#1565c0', fontWeight: 700, letterSpacing: 1 }}
               >
-                Floria Scouting Manager
+                Floria S.M.
               </Typography>
             </Link>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
             <Button
               component={Link}
               to="/notereferti"
@@ -103,14 +103,7 @@ export default function HomePage() {
             >
               Note & Referti
             </Button>
-            <Button
-              component={Link}
-              to="/dashboard"
-              variant="text"
-              sx={{ color: '#1565c0', textTransform: 'none' }}
-            >
-              Scouting
-            </Button>
+            {/* RIMOSSO: pulsante "Scouting" dalla navbar */}
             <Button
               onClick={handleLogout}
               variant="outlined"
@@ -119,7 +112,7 @@ export default function HomePage() {
                 color: '#1565c0',
                 borderRadius: '999px',
                 textTransform: 'none',
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
                 '&:hover': { backgroundColor: 'rgba(21,101,192,0.08)' }
               }}
             >
@@ -154,7 +147,6 @@ export default function HomePage() {
         >
           Benvenuto, {username}
         </Typography>
-
 
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
