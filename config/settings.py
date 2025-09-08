@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "corsheaders",
+
+    "storages"
 ]
 
 # === Middleware (ordine importante: WhiteNoise subito dopo Security) ===
@@ -106,6 +108,23 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
+# === Cloudflare R2 (S3 compatibile) ===
+AWS_ACCESS_KEY_ID = os.getenv("a21f1b5bebea399709fe592c2687d210")
+AWS_SECRET_ACCESS_KEY = os.getenv("4a7c66684c22ba1434ba0eb997f52d53497387561741a01ee33912512d44bb40")
+AWS_STORAGE_BUCKET_NAME = os.getenv("note-gara")  # es. "note-gara"
+AWS_S3_ENDPOINT_URL = os.getenv("https://22503d6794c52f90beba41e1e86c3b1e.r2.cloudflarestorage.com")     # es. "https://<ACCOUNT_ID>.r2.cloudflarestorage.com"
+# Usa R2 come storage per i file caricati
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+
+# Configurazioni consigliate
+AWS_QUERYSTRING_AUTH = True            # genera URL firmati (più sicuro)
+AWS_S3_FILE_OVERWRITE = False          # evita di sovrascrivere file con lo stesso nome
+AWS_DEFAULT_ACL = None
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+
 # === Localizzazione ===
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -121,8 +140,13 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))  # Railway: /app/media (volume)
+# Usa R2 per i media se le variabili sono presenti, altrimenti locale (per sviluppo)
+if os.getenv("R2_ACCESS_KEY_ID"):
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    MEDIA_URL = "/media/"
+else:
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
