@@ -237,19 +237,26 @@ function Segnalati() {
   // NUOVO: apertura PDF con token
   const openPdf = async (fileUrl) => {
     try {
-      const base = (api.defaults?.baseURL || '').replace(/\/+$/, '');
-      const path = fileUrl?.startsWith('http') ? fileUrl.replace(base, '') : fileUrl;
+      if (!fileUrl) throw new Error('Nessun URL disponibile');
 
-      const res = await api.get(path, { responseType: 'blob' });
+      // URL assoluto (R2 firmato) → apri diretto, niente header/Token
+      if (/^https?:\/\//i.test(fileUrl)) {
+        window.open(fileUrl, '_blank', 'noopener,noreferrer');
+        return;
+      }
+
+      // Fallback: path relativo (es. /media/...) → scarica via API con token
+      const res = await api.get(fileUrl, { responseType: 'blob' });
       const blob = new Blob([res.data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank', 'noopener,noreferrer');
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (err) {
       console.error('Errore apertura PDF:', err);
-      setError('Impossibile aprire il PDF. Controlla il file o riprova.');
+      setError && setError('Impossibile aprire il PDF. Controlla il file o riprova.');
     }
   };
+
 
   return (
     <Box
@@ -524,7 +531,7 @@ function Segnalati() {
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold">Note Gara:</Typography>
                     <Button
-                      onClick={() => openPdf(selectedGiocatore.note_gara)}
+                      onClick={() => openPdf(selectedGiocatore.note_gara_url || selectedGiocatore.note_gara)}
                       variant="outlined"
                       size="small"
                     >

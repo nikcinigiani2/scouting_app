@@ -136,19 +136,26 @@ export default function NoteAnnoPage() {
   // NUOVO: apertura PDF con token
   const openPdf = async (fileUrl) => {
     try {
-      const base = (api.defaults?.baseURL || '').replace(/\/+$/, '');
-      const path = fileUrl?.startsWith('http') ? fileUrl.replace(base, '') : fileUrl;
+      if (!fileUrl) throw new Error('Nessun URL disponibile');
 
-      const res = await api.get(path, { responseType: 'blob' });
+      // URL assoluto (R2 firmato) → apri diretto, niente header/Token
+      if (/^https?:\/\//i.test(fileUrl)) {
+        window.open(fileUrl, '_blank', 'noopener,noreferrer');
+        return;
+      }
+
+      // Fallback: path relativo (es. /media/...) → scarica via API con token
+      const res = await api.get(fileUrl, { responseType: 'blob' });
       const blob = new Blob([res.data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank', 'noopener,noreferrer');
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (err) {
       console.error('Errore apertura PDF:', err);
-      setError('Impossibile aprire il PDF. Controlla il file o riprova.');
+      setError && setError('Impossibile aprire il PDF. Controlla il file o riprova.');
     }
   };
+
 
   return (
     <Box
@@ -280,8 +287,7 @@ export default function NoteAnnoPage() {
                     key={f.id}
                     secondaryAction={
                       <Box>
-                        <IconButton onClick={() => openPdf(f.file)}
-                          sx={{ color: 'primary.main', bgcolor: '#fff !important', mr: 1 }}>
+                        <IconButton onClick={() => openPdf(f.file_url || f.file)}>
                           <CloudDownload />
                         </IconButton>
                         <IconButton color="error" onClick={() => handleDelete(f.id)}
