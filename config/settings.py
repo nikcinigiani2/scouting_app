@@ -110,43 +110,46 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # === Cloudflare R2 (S3 compatibile) ===
-AWS_ACCESS_KEY_ID = os.getenv("a21f1b5bebea399709fe592c2687d210")
-AWS_SECRET_ACCESS_KEY = os.getenv("4a7c66684c22ba1434ba0eb997f52d53497387561741a01ee33912512d44bb40")
-AWS_STORAGE_BUCKET_NAME = os.getenv("note-gara")  # es. "note-gara"
-AWS_S3_ENDPOINT_URL = os.getenv("https://22503d6794c52f90beba41e1e86c3b1e.r2.cloudflarestorage.com")     # es. "https://<ACCOUNT_ID>.r2.cloudflarestorage.com"
-# Usa R2 come storage per i file caricati
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+import os
 
+def _has_env(*keys):
+    return all(os.getenv(k) for k in keys)
 
-# Configurazioni consigliate
-AWS_QUERYSTRING_AUTH = True            # genera URL firmati (più sicuro)
-AWS_S3_FILE_OVERWRITE = False          # evita di sovrascrivere file con lo stesso nome
-AWS_DEFAULT_ACL = None
-AWS_S3_ADDRESSING_STYLE = "virtual"
-AWS_S3_SIGNATURE_VERSION = "s3v4"
+USE_R2 = _has_env("R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET_NAME", "R2_ENDPOINT_URL")
 
-# === Localizzazione ===
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
-USE_I18N = True
-USE_TZ = True
+if USE_R2:
+    # Parametri S3 (Cloudflare R2)
+    AWS_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")  # es. "note-gara"
+    AWS_S3_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")     # es. "https://<ACCOUNT_ID>.r2.cloudflarestorage.com"
+
+    AWS_QUERYSTRING_AUTH = True            # URL firmate
+    AWS_S3_FILE_OVERWRITE = False          # non sovrascrivere nomi uguali
+    AWS_DEFAULT_ACL = None
+    AWS_S3_ADDRESSING_STYLE = "virtual"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
 
 # === Statici & Media ===
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"  # Railway: collectstatic qui
 
+# In Django 4+, usa STORAGES. Configuriamo "default" in base a USE_R2.
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage" if USE_R2
+        else "django.core.files.storage.FileSystemStorage"
+    },
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
-# Usa R2 per i media se le variabili sono presenti, altrimenti locale (per sviluppo)
-if os.getenv("R2_ACCESS_KEY_ID"):
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    MEDIA_URL = "/media/"
+# Media
+if USE_R2:
+    MEDIA_URL = "/media/"          # i FileField generano URL firmate R2
 else:
-    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_ROOT = BASE_DIR / "media" # solo in fallback locale
     MEDIA_URL = "/media/"
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
