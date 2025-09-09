@@ -25,7 +25,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 
-from apps.scouting.views import storage_debug
+from apps.scouting.views import storage_debug, env_debug
 
 
 def healthz(_request):
@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('accounts/', include('django.contrib.auth.urls')),  # Autenticazione built-in
     path("api/debug/storage", storage_debug),
+    path("api/debug/env", env_debug),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

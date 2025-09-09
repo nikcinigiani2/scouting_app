@@ -269,3 +269,10 @@ def storage_debug(request):
         "storage_class": default_storage.__class__.__name__,
         "use_r2": getattr(settings, "USE_R2", None),
     })
+def env_debug(request):
+    return JsonResponse({
+        "R2_ACCESS_KEY_ID": bool(os.getenv("R2_ACCESS_KEY_ID")),
+        "R2_SECRET_ACCESS_KEY": bool(os.getenv("R2_SECRET_ACCESS_KEY")),
+        "R2_BUCKET_NAME": os.getenv("R2_BUCKET_NAME"),
+        "R2_ENDPOINT_URL": os.getenv("R2_ENDPOINT_URL"),
+    })
