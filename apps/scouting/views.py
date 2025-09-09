@@ -15,6 +15,9 @@ from django.conf import settings
 from django.http import FileResponse, Http404
 import os
 
+
+
+
 # CRUD per Segnalati
 class SegnalatoListCreateAPIView(generics.ListCreateAPIView):
     queryset = Segnalato.objects.all()
@@ -251,3 +254,18 @@ class NotaViewSet(viewsets.ModelViewSet):
         ctx['request'] = self.request
         return ctx
 
+
+
+from django.http import JsonResponse
+from django.core.files.storage import default_storage
+from django.conf import settings
+
+def storage_debug(request):
+    """
+    Endpoint di debug: indica quale storage è attivo.
+    Atteso: {"storage_class":"S3Boto3Storage","use_r2": true}
+    """
+    return JsonResponse({
+        "storage_class": default_storage.__class__.__name__,
+        "use_r2": getattr(settings, "USE_R2", None),
+    })

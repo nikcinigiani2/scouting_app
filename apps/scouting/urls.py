@@ -11,9 +11,10 @@ from .views import (
     LoginView,
     UserProfileView,
     GlobalSearchAPIView,
-    NotaViewSet
+    NotaViewSet, storage_debug
 )
 from rest_framework.routers import DefaultRouter
+
 
 router = DefaultRouter()
 router.register(r'note', NotaViewSet, basename='nota')
@@ -35,6 +36,7 @@ urlpatterns = [
     path('converti/<int:pk>/', ConvertiSegnalatoToVisionatoAPIView.as_view(), name='converti-segnalato'),
     # Endpoint per la ricerca globale
     path('ricerca/', GlobalSearchAPIView.as_view(), name='global-search'),
+    path("api/debug/storage", storage_debug),
 ]
 
 urlpatterns += router.urls
